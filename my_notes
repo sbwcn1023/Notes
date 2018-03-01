@@ -1,0 +1,5134 @@
+///////////////////////////////////////////////////////////////////////////////////////////
+author:						su bowu
+create file date:			2015/12/26
+lastesd modify date:		2017/12/07
+description: 				
+
+数学基础：笛卡尔坐标、齐次坐标（投影坐标）、矩阵变换、倒置矩阵、逆矩阵（2~4的矩阵）
+简单来说“仿射变换”就是：“线性变换”+“平移”。
+
+数学中，一个由集合X映射至集合Y的函数，若对每一在Y内的y，存在唯一一个在X内的x与其对应，则此函数为双射函数
+
+仿射变换是一种二维坐标到二维坐标的线性变换，变换保持二维图形间的相对位置关系不发生变化：平行线还是平行线、直线还是直线、并且同一条直线上的点的位置顺序和长度的比例关系不变．
+但向量的夹角可能会发现变化，垂直关系可能会发生变化． 仿射变换可以通过一系列的基本变换的复合来实现，这些基本的变换包括平移、缩放、旋转、翻转和错切，
+错切：错切是在某方向上，按照一定的比例对图形的每个点到某条平行于该方向的直线的有向  距离  做放缩得到的平面图形。
+
+弧度 = 一周的弧度数为2πr/r=2π，360°角=2π弧度（弧长= 2πr *　(角度/360)）
+
+atan2/atan :返回值的单位为弧度，取值范围为 (-pi, pi];
+
+一π等于180度
+两π等于360度,也就是一个圆周
+用π来表示的角度叫做弧度,单位是1
+1弧度就等于180度除以π约等于57.3度
+1度就等于π除以180约等于0.01745
+
+sin(A+B) = sinAcosB+cosAsinB 
+sin(A-B) = sinAcosB-cosAsinB  
+cos(A+B) = cosAcosB-sinAsinB 
+cos(A-B) = cosAcosB+sinAsinB 
+tan(A+B) = (tanA+tanB)/(1-tanAtanB) 
+tan(A-B) = (tanA-tanB)/(1+tanAtanB) 
+cot(A+B) = (cotAcotB-1)/(cotB+cotA)  
+cot(A-B) = (cotAcotB+1)/(cotB-cotA)
+
+
+问题描述：已知两条线段P1P2和Q1Q2，判断P1P2和Q1Q2是否相交，若相交，求出交点。
+
+两条线段的位置关系可以分为三类：有重合部分、无重合部分但有交点、无交点。
+
+算法的步骤如下：
+
+1.快速排斥实验。
+
+设以线段P1P2为对角线的矩形为R，设以线段Q1Q2为对角线的矩形为T，如果R和T不相交，则两线段不相交。
+
+2.跨立实验。
+
+如果两线段相交，则两线段必然相互跨立对方。
+
+若P1P2跨立Q1Q2，则矢量(P1-Q1)和(P2-Q1)位于矢量(Q2-Q1)的两侧，即( P1 - Q1 ) × ( Q2 - Q1 ) * ( P2 - Q1 ) × ( Q2 - Q1 ) < 0。
+
+若Q1Q2跨立P1P2，则矢量(Q1-P1)和(Q2-P1)位于矢量(P2-P1)的两侧，即( Q1 - P1 ) × ( P2 - P1 ) * ( Q2 - P1 ) × ( P2 - P1 ) < 0。
+
+将角度乘以 π/180 即可转换为弧度，将弧度乘以 180/π 即可转换为角度。
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+数学：
+
+s = 2^0+2^1+2^2+2^3+....+2^n-1;
+2s = 2^1+2^2+2^3+....+2^n-1+2^n;
+两式相减得出 s = 2^n - 2^0 = 2^n - 1;
+
+二进制和十进制的转换：
+十进制转二进制：整数部分除2取余，最后余数倒过来;小数部分乘2得到的整数直到小数为零或取到保留有效位停止（(0.5)10=(101/1010)2）
+
+
+向量的点乘与叉积：
+点乘计算夹角；
+角度 = 点乘 / 标量乘积
+
+叉乘：
+A(ax,ay,az)
+B(bx,by,bz)
+ax		bx
+ay		by
+az		bz
+C = A * B 
+{
+	ay * bz - az * by,
+	az * bx - ax * bz,
+	ax * by - ay * bx
+		
+}
+
+
+向量相乘：
+	1.只有当左侧矩阵的列数与右侧矩阵的行数相等，两个矩阵才能相乘（每一个对应相乘：循环：左侧一行乘以右侧每一列）。（图形中用的最多是4*4以及以内矩阵）x y z w四分向量
+	譬如将屏幕坐标转为为ndc（标准化设备坐标）
+	(x,y,z, w) 代表一个屏幕坐标，真实屏幕大小为2560 * 1440
+	
+	先将(x,y,z) 减去真实屏幕的1/2 再除以真实屏幕-》ndc坐标（-1,1）范围内 
+	(1x4 * 4x4)
+	
+									x1,x2,x3,x4,	2560 2560 2560 2560
+		(系数必须只有一行或一列)	y1,y2,y3,y4, - 	1440 1440 1440 1440
+		(1/1280), (1/720), 1, 1	*	z1,z2,z3,z4,	0	0	0	0
+									w1,w2,w3,w4		0	0	0	0
+									
+	或者
+
+		x1,y1,z1,w1,	2560 2560 2560 2560		（1/1280）
+	    x2,y2,z2,w2, - 	1440 1440 1440 1440  * 	（1/720）
+	    x3,y3,z3,w3,	0	0	0	0				1
+	    x4,y4,z4,w4		0	0	0	0				1
+	
+	
+	2.矩阵相乘不遵守交换律(Commutative)，也就是说A?B≠B?AA?B≠B?A。
+
+char *m_buffer;
+unsigned int m_size;
+//current当前数据未指针位置：current 是char类型指针 = char指针 + 指针位移大小
+char *current = m_buffer + m_size;
+///////////////////////////////////////////////////////////////////////////////////////////
+
+UTF- 8编码的文件中，BOM占三个字节。如果用记事本把一个文本文件另存为UTF-8编码方式的话，用UE打开这个文件，切换到十六进制编辑状态就可以看到开 头的FFFE了。
+这是个标识UTF-8编码文件的好办法，软件通过BOM来识别这个文件是否是UTF-8编码，很多软件还要求读入的文件必须带BOM。可是，还是有很多软件不能识别BOM。
+
+
+///////////////////////////////////////////////////////////////////////////////////////////
+ATTRIBUTE_FORMAT_FUNC:
+__attribute__( ( format( printf，m，n ) ) )
+__attribute__( ( format( scanf，m，n ) ) )
+其中参数m与n的含义为：
+m：第几个参数为格式化字符串（format string）；
+n：参数集合中的第一个，即参数“…”里的第一个参数在函数参数总数排在第几
+注意，有时函数参数里还有“隐身”的呢，后面会提到；
+在使用上，__attribute__((format(printf,m,n)))是常用的，而另一种却很少见到。
+下面举例说明，其中myprint为自己定义的一个带有可变参数的函数，其功能类似于printf：
+//m=1；n=2
+extern void myprint( const char *format，… ) __attribute__( ( format( printf，1，2 ) ) );
+//m=2；n=3
+extern void myprint( int l，const char *format，... ) __attribute__( ( format( printf，2，3 ) ) );
+需要特别注意的是，如果myprint是一个函数的成员函数，那么m和n的值可有点“悬乎”了，例如：
+//m=3；n=4
+extern void myprint( int l，const char *format，... ) __attribute__( ( format( printf，3，4 ) ) );
+其原因是，类成员函数的第一个参数实际上一个“隐身”的“this”指针。（有点C++基础的都知道点this指针，不知道你在这里还知道吗？）
+
+///////////////////////////////////////////////////////////////////////////////////////////
+
+面向对象--
+		封装：封装可以隐藏实现细节，使得代码模块化
+		继承：继承可以扩展已存在的代码模块（类）
+		多态：为了实现另一个目的——接口重用
+		
+		google： 接口（Interface Interface Interface Interface）
+			接口是指满足特定条件的类，这些类以 Interface 为后缀（非必需）。
+			定义：当一个类满足以下要求时，称之为纯接口：
+			1) 只有纯虚函数（"=0"）和静态函数（下文提到的析构函数除外）；
+			2) 没有非静态数据成员；
+			3) 没有定义任何构造函数。如果有，也不含参数，并且为 protected；
+			4) 如果是子类，也只能继承满足上述条件并以 Interface 为后缀的类。
+		
+	1. 实现继承是指使用基类的属性和方法而无需额外编码的能力；
+	2. 接口继承是指仅使用属性和方法的名称、但是子类必须提供实现的能力；
+	3. 可视继承是指子窗体（类）使用基窗体（类）的外观和实现代码的能力
+	
+	虚函数：对于虚函数来说，父类和子类都有各自的版本。由多态方式调用的时候动态绑定
+	
+	那么编译器是如何利用虚表指针与虚表来实现多态的呢？是这样的，当创建一个含有虚函数的父类的对象时，编译器在对象构造时将虚表指针指向父类的虚函数；同样，当创建子类的对象时，
+	编译器在构造函数里将虚表指针（子类只有一个虚表指针，它来自父类）指向子类的虚表（这个虚表里面的虚函数入口地址是子类的）
+	
+	如果是调用Base *p = new Derived(); 生成的是子类的对象，在构造时，子类对象的虚指针指向的是子类的虚表，接着由Derived*到Base*的转换并没有改变虚表指针，
+	所以这时候p->VirtualFunction，实际上是p->vfptr->VirtualFunction，它在构造的时候就已经指向了子类的VirtualFunction，所以调用的是子类的虚函数，这就是多态
+	
+	纯虚函数: 纯虚函数是在基类中声明的虚函数，它在基类中没有定义，但要求任何派生类都要定义自己的实现方法。在基类中实现纯虚函数的方法是在函数原型后加“=0”
+	抽象类：当一个类中有一个或多个纯虚函数的时候，这个类就自动成为了抽象类，即不可以实例化。
+	
+	友元不是成员函数，只有成员函数才可以是虚拟的，因此友元不能是虚拟函数。但可以通过让友元函数调用虚拟成员函数来解决友元的虚拟问题。
+	
+	派生类继承了基类的属性，同名函数被视为与基类具有相同属性的函数
+	 如果基类为纯虚函数的话，那么派生类中也不用声明为virtual函数，但是必须实现其纯虚函数或者多重继承。
+	
+<<案列分析>>
+		// 将二进制数据转换成16进制字符串
+		// 注意，hex_buff 的空间必须2倍length以上
+		void BinToHex(const char *data, int length, char *hex_buff)
+		{
+			static const char *hex_map = "0123456789ABCDEF"; //16个char数组
+
+			const char *data_end = data + length;
+			while (data < data_end)
+			{
+				unsigned char c = *data++;
+				
+				//用16bit存8bit(所以内存需要2倍) -- 	保存的不是原始数据而是hex_map的数据（char类型）
+				*hex_buff++ = hex_map[(c & 0xf0) >> 4]; //取高4位(数组索引最大15)
+				*hex_buff++ = hex_map[c & 0x0f];		//取低4位
+			}
+		}
+
+	// 将16进制字符串转换回二进制数据(反推算出数据)
+	// 注意，data必须 1/2的length以上
+	void HexToBin(const char *hex_buff, int length, char *data)
+	{
+		static const unsigned char bin_map[256] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,1,2,3,4,5,6,7,8,9,0,0,0,0,0,0,0,10,11,12,13,14,15};
+
+		const char *hex_end = hex_buff + length;
+		while (hex_buff < hex_end)
+		{
+			unsigned char c = 0;
+			//数组索引值范围为:保存起来的字符(0 ~ F)		(char范围 0 ~ 255, bin_map实际数组下标范围为0~F的ASCII值即int 0 - 72)
+			c |= bin_map[int(*hex_buff++)] << 4;			//高4位
+			*data++ = c | bin_map[int(*hex_buff++)];		//底4位 ==>char 8位
+		}
+	}
+	
+<</案例分析>>
+	
+注意事项：
+	c/c++ : 是坚决反对与平台绑定的(可移植性)
+	
+	<<注意代码风格>>
+		“{“、”}”各占一行
+		运算符与数字之间要有空格、if 与（）之间有空格、判断与不关联代码要隔一行
+		函数名--单词头字母大写
+		变量、成员变量"_"连接各个单词（成员变量member m_ 打头）
+	<</注意代码风格>>
+	
+	如果出现：Warning C4819：The file contains a character that can ot be represented in the current code page(936). save the file in unicode format to prevent data loss.
+	利用查找功能：打开查找隐藏文本和使用正则表达式式 查找 '\n' 替换为 '\n' ： 把跨平台的\n 替换为当前平台的\n
+	
+	<<编码安全>>
+	
+		越界访问内存将会十分危险，修改不属于自己的内存导致程序崩溃并且原因难以查明:因为被修改的内存是不可知的，所以出错是不能调试确定！
+		
+		1.指针判断（空指针、野指针的错误使用导致崩溃）
+		2.数组越界 : 用数组时必须判断下标不能大于该数组长度（数组下标同时不能小于0）
+		3.memcpy()等函数，需判断是否越界，以目的长度为准（防止越界错误）
+		4.当数组传进函数进行操作是请不要用memcpy复制整个数组，因为函数只知道你是指针，并不知道你是数组
+		5.整数用 0，实数用 0.0，指针用 NULL，字符（串）用'\0'。
+		6.operator”: 32 位移位的结果被隐式转换为 64 位(是否希望进行 64 位移位?) 请使用: 1<<n ----> 1i64<<n
+		
+	<</编码安全>>
+	
+	<<基础知识>>
+	class\struct{}；后面之所以加分号，因为c++每一条语句有有分号隔开；class和struct时也是声明就跟声明变量一样。
+	
+	main函数：int main(int argc, char **argv/char *argv[])	
+	默认有一个参数：参数内容为这个程序的绝对路径
+	
+		1.enum、struct、union class
+		  enum -- UINT(类型) sizeof(enum) = 4字节; 枚举是一种数据类型，第一个如果没有赋值默认为0，依次递增
+		  枚举中不能有相同的命名例如：
+			    enum DefType{
+					a = 10,
+					b = 5
+					};
+	
+				enum DefType2{
+					a = 100,
+					b2 = 50
+				};
+				
+				a枚举重复!!!!!!!!!!!
+		enum结构体定义都是一些常量值，放在  静态常量存储区，类似于类里面声明为static const的常量。
+		  
+		  
+		  struct\class -- 以struct的大小是内长度最大的变量为倍数
+		  union -- union的大小为其中变量最大的长度的大小
+		  
+		2.关于C++的隐藏规则：
+		我曾经听说过C++的隐藏规则：
+			多态：
+				1.覆盖 --虚函数（或者接口--纯虚函数）
+				2.重载 --同名函数（参数不同）-- 重载运算符(<<需要声明为friend)
+		
+		（1）如果派生类的函数与基类的函数同名，但是参数不同。此时，不论有无virtual
+				关键字，基类的函数将被隐藏（注意别与重载混淆 -- 重载在同一个类内）。
+
+		（2）如果派生类的函数与基类的函数同名，并且参数也相同，但是基类函数没有virtual
+				关键字。此时，基类的函数被隐藏（注意别与覆盖混淆）
+				
+		********************子类有父类同名函数，不管参数是否一致，无论父类虚函数还是非虚函数都会隐藏起来******************************
+				
+		 (3)需要修改容器的迭代器变量都不能:for (;; ++it)
+				需要for(;;)
+				{
+					if ()
+					{
+					}
+					else
+					{
+						++it;
+					}
+				}
+		 
+				iterator类里面包含一个指向容器元素的指针pointer to element 
+		 
+				iterator(线性 -- ++ --，非线性 advance)
+				
+				erase:: 返回值是一个迭代器，指向删除元素下一个元素（返回值），当erase后，旧的容器会被重新整理成一个新的容器
+
+				 
+				错误的用法：	
+				for(vector::iterator iter = veci.begin(); iter != veci.end(); ++ iter)			//当删除尾元素时返回的就是end(),再执行++报错！！！
+				{
+					 if( *iter == 3)
+					 {
+						it == veci.erase(iter);
+					 }
+				}
+				
+				//正确用法
+				for(vector::iterator iter = veci.begin(); iter != veci.end();)
+				{
+					 if( *iter == 3)
+					 {
+						iter = veci.erase(iter); //别用veci.erase(it++)，序列容器一旦增删迭代器就会失效，只能重新赋值！
+					 }
+					 else
+					 {
+						++it;					 
+					 }
+				}
+				
+				1.使用删除之前的迭代器定位下一个元素。STL建议的使用方式（安全）
+
+				for (ITER iter=mapTest.begin();iter!=mapTest.end();)
+				{
+					cout<<iter->first<<":"<<iter->second<<endl;
+					mapTest.erase(iter++);
+				}
+				
+				使用erase(iter++)，因为iter2 = iter++是iter先移到指向下一个节点，而iter2还是指向当前的节点。注意理解iter++与++iter的区别
+				
+				const_iterator& operator++() -- 前缀++返回引用 : 自增后再返回引用
+					{	// preincrement
+					_Inc();
+					return (*this);
+					}
+
+				const_iterator operator++(int) -- 后缀++返回值 : 自己自增， 但返回是自增前的值（副本）
+					{	// postincrement
+					const_iterator _Tmp = *this;
+					++*this;
+					return (_Tmp);
+					}
+				
+				2. erase() 成员函数返回下一个元素的迭代器**********************************************************************
+				for (ITER iter=mapTest.begin();iter!=mapTest.end();)
+				{
+					cout<<iter->first<<":"<<iter->second<<endl;
+					iter = mapTest.erase(iter);
+				}
+				
+			顺序存储容器和动态内存容器的迭代器：
+				1.顺序存储的一旦erase，之后的迭代器都失效了；随机存储容器则不存在这样的问题；
+				案例：
+						std::vector<int> tmp_vec;
+						tmp_vec.push_back(1);
+						tmp_vec.push_back(2);
+						tmp_vec.push_back(2);
+						tmp_vec.push_back(3);
+
+						for (std::vector<int>::iterator it = tmp_vec.begin(); it != tmp_vec.end();)
+						{
+							if (2 == *it)
+							{
+								tmp_vec.erase(it++);	//序列容器一旦增删迭代器就会失效，只能重新赋值！使用it = tmp_vec.erase(it);
+							}
+							else
+							{
+								++it;
+							}
+						}
+						
+						
+			<<迭代器>>
+				
+				标准序列容器一旦erase，后序的迭代器都失效了必须使用 it = erase(it);而不能 erase(it++);
+				原因标准容器的迭代器里面有一个:	__CLR_OR_THIS_CALL _Iterator_base(): _Mycont(0), _Mynextiter(0)
+				_Mynextiter变化了，如果删除后前后两个迭代器不一样了(xutility)；
+				
+				关联容器erase只是当前容器失效了，可以erase(it++)(xtree)
+				
+				
+				std::vector<int> test_vec3(100000, 1);
+
+				unsigned long long now = GetTickCount64();
+				for (std::vector<int>::iterator it = test_vec3.begin(); it != test_vec3.end(); ++it)
+				{
+
+				}
+------------------------------------------------------------------------------------------------------------------（c++11 range循环性能是上面两倍以上！！！）
+				printf("elapse time %lld \n", GetTickCount64() - now);
+				
+				now = GetTickCount64();
+				for (auto it : test_vec3)
+				{
+
+				}
+				printf("elapse time %lld \n", GetTickCount64() - now);
+				
+				在遍历容器的时候，auto自动推导的类型是容器的value_type类型，而不是迭代器，而map中的value_type是std::pair，也就是说val的类型是std::pair类型的，
+				因此需要使用val.first,val.second来访问数据(auto必须声明时初始化--推断类型，编译期所做的工作)
+				
+		 (4)
+		 	指针：寻址空间大小（一个地址一byte而不是bit）
+		 			32位系统：指针4字节(2^32 - 1)(一个地址大小为1B(8bit))
+		 			64位系统: 指针8字节（寻址空间2^64 - 1）
+
+		 (5)virtual声明需要，子类覆盖父类的虚函数声明也需要(cpp中实现不需要)，纯虚函数需要在声明后加 " = 0;" ------包含纯虚函数的类都是抽象类不能实例化！！！！
+		 		父类可以指向子类，子类不可以指向父类(可强制转换)
+				
+				指向派生类的指针，因为内存空间比基类长，会导致严重了后果，所以不允许派生类的指针指向基类。而基类的指针可以指向派生类。
+				
+				请注意强制转换和指向的不同：
+				指向：父类指针能够指向子类，子类指针不能指向父类指针；
+					Drive *d = new Drive();
+					Base *b = new Base();
+					d = b; ///报错，除非dynamic_cast<>或者static_cast<>
+					
+					b = d; //但b不能用非b函数（virtual 重写除外）
+				
+				
+				强制转换：
+				++++++++++++++当父类子类有同名 非虚函 数的时候，调用的是  转换后  的指针类型的函数；
+
+　　　　　　　　++++++++++++++当父类子类有同名 虚函数 的时候，调用的是指针 转换前  指向的对象类型的函数。
+
+				基类、子类同名成员变量时：int m_a;//子类要访问基类同名成员必须BaseClass::成员名，成员变量时不具有多态性质的，所以和同名非虚函数一样：调用的是  转换后  的指针类型的函数；
+
+		 (6)同一类内使用类内方法:  尽量使用 this->
+
+		 (7)内存对齐 -- cpu访问速度等：
+		 平台原因(移植原因)：不是所有的硬件平台都能访问任意地址上的任意数据的；某些硬件平台只能在某些地址处取某些特定类型的数据，否则抛出硬件异常。
+		 性能原因：数据结构(尤其是栈)应该尽可能地在自然边界上对齐。边界对齐原因在于，为了访问未对齐的内存，处理器需要作两次内存访问；而对齐的内存访问仅需要一次访问。
+			1)结构体变量的首地址是其最长基本类型成员的整数倍；
+				备注：编译器在给结构体开辟空间时，首先找到结构体中最宽的基本数据类型，然后寻找内存地址能是该基本数据类型的整倍的位置，作为结构体的首地址。
+				将这个最宽的基本数据类型的大小作为上面介绍的对齐模数
+				备注: 为结构体的一个成员开辟空间之前，编译器首先检查预开辟空间的首地址相对于结构体首地址的偏移是否是本成员的整数倍，若是，则存放本成员，反之，
+				则在本成员和上一个成员之间填充一定的字节，以达到整数倍的要求，也就是将预开辟空间的首地址后移几个字节
+				
+				a、结构体总大小是包括填充字节，最后一个成员满足上面两条以外，还必须满足第三条，否则就必须在最后填充几个字节以达到本条要求。
+				b、如果结构体内存在长度大于处理器位数的元素，那么就以处理器的倍数为对齐单位；否则，如果结构体内的元素的长度都小于处理器的倍数的时候，便以结构体里面最长的数据元素为对齐单位。
+			2) 结构体内类型相同的连续元素将在连续的空间内，和数组一样。
+			
+		//内存对齐分配
+		void* AlignedMemory::allocate(size_t size, size_t alignment)
+		{
+			assert(0 < alignment && alignment <= 128 && Bitwise::isPO2(alignment));
+
+			unsigned char* p = new unsigned char[size + alignment];
+			size_t offset = alignment - (size_t(p) & (alignment-1));
+
+			unsigned char* result = p + offset;
+			result[-1] = (unsigned char)offset;
+
+			return result;
+		}
+
+		 (8) 继承：虚函数实现多态，当基类指向派生类时，调用函数动态决定的。当子类需要父类的数据时，父类声明为protected
+		 (9) 这就是实例化的原因（空类同样可以被实例化），每个实例在内存中都有一个独一无二的地址，为了达到这个目的，
+		 	编译器往往会给一个空类隐含的加一个字节，这样空类在实例化后在内存得到了独一无二的地址，所以空类所占的内存大小是1个字节（就是一个地址:大小为1B）
+		 (10) 指针作为函数参数： 
+			一、不能为该指针申请内存（值传递问题，把指针类型当作一个int(32位或者64位:存储内存地址)）
+			二、参数是副本值，但可以对已知内存执行 p++、p[i]操作等
+			这样申请内存：
+			char *GetMemory(int num)
+			{
+				 char *p = (char *)malloc(sizeof(char) * num);
+				 return p;
+			}
+		 
+		 (11)如果自己定义默认构造函数、默认析构函数，那请实现它！
+		 
+			 一个类名和带括号的一组表达式结合起来将构造一个该类型的值。如果括号中只有一个表达式，其语义等于使用cast表达式转换。如果有多个表达式，则调用相应的构造函数。T(x1,x2, ...)就相当于是临时声明一个对象T t(x1, x2, ...)，其中t是个纯右值(prvalue)。
+			#include <stdio.h>
+			class T
+			{
+			public:
+				T(int, double) { printf("%p->T(int,double)\n", this); }
+				T(const T& t) { printf("%p->T(const T& %p)\n", this, &t); }
+				T(T&& t) { printf("%p->T(T&& %p)\n", this, &t); }
+			};
+			class S
+			{
+			public:
+				T t;
+			};
+
+			int main()
+			{
+				S s1 = { T(1, 2.0) };
+				printf("%p\n", &s1.t);
+
+				T t2(1, 2.0);
+				S s2 = { t2 };
+				printf("%p\n", &s2.t);
+
+				T t3(1, 2.0);
+				S s3 = { (T&&)t3 };
+				printf("%p\n", &s3.t);
+			}
+
+			s1这种初始化写法与s2和t3的初始化写法相当。只是s1中的这是个临时对象，是纯右值，不会再被其它代码所使用，这样有个好处是可以不触发复制构造。
+			
+		 不能在构造或者析构时调用虚函数：
+			在构造时，子类还没构造出来，因此调用虚函数都会被当作调用基类函数！！！
+			在析构时，由于基类已经析构了，一旦子类析构中调用了基类的函数后果将不可预料。
+
+		 (12)
+				1) static_cast：和 C 风格转换相似可做值的强制转换，或指针的父类到子类的明确的向上(强制转换只能有人保证安全)转换；
+				①用于类层次结构中基类和子类之间指针或引用的转换。
+				进行上行转换（把子类的指针或引用转换成基类表示）是安全的；
+				进行下行转换（把基类指针或引用转换成子类表示）时，由于没有动态类型检查，所以是不安全的。
+				②用于基本数据类型之间的转换，如把int转换成char，把int转换成enum。这种转换的安全性也要开发人员来保证。
+				③把空指针转换成目标类型的空指针。
+				④把任何类型的表达式转换成void类型。
+				
+				2) const_cast：移除 const 属性；
+				3) reinterpret_cast：指针类型和整型或其他指针间不安全的相互转换，操作符修改了操作数类型,但仅仅是重新解释了给出的对象的比特模型而没有进行二进制转换。
+				4) dynamic_cast：除测试外不要使用，除单元测试外，如果你需要在运行时确定类型信息，说明设计有缺陷（参考 RTTI）。继承关系的类指针对象或引用之间转换
+				dynamic_cast <type-id> (expression)该运算符把expression转换成type-id类型的对象。Type-id 必须是类的指针、类的引用或者void*；
+				
+				dynamic基类必须要有虚函数，否则会编译出错；static_cast则没有这个限制。
+				这是由于运行时类型检查需要运行时类型信息，而这个信息存储在类的虚函数表（关于虚函数表的概念，
+				详细可见<Inside c++ object model>）中，只有定义了虚函数的类才有虚函数表，没有定义虚函数的类是没有虚函数表
+				
+				每个包含有虚方法的类内有一个虚函数表指针（4/8字节），该指针指向虚函数表；
+				一般说来，当从派生类中访问虚基类成员时，应该先强制转化派生类指针为虚基类指针，然后一直使用虚基类指针来访问虚基类成员变量。这样做，可以避免每次都要计算虚基类地址的开销。 见下例。
+				/* before: */             ... pi->c1 ... pi->c1 ...
+				/* faster: */ C* pc = pi; ... pc->c1 ... pc->c1 ...
+				译者注：前者一直使用派生类指针pi，故每次访问c1都有计算虚基类地址的较大开销；后者先将pi转化为虚基类指针pc，故后续调用可以省去计算虚基类地址的开销
+				
+				static_cast和reinterpret_cast的区别主要在于多重继承，比如
+				
+				class A 
+				{
+					public:
+					int m_a;
+				};
+				
+				class B 
+				{
+					public:
+					int m_b;
+				};
+				 
+				class C : public A, public B {};
+				
+				那么对于以下代码：
+				C c;
+				printf("%p, %p, %p", &c, reinterpret_cast<B*>(&c), static_cast <B*>(&c));
+				前两个的输出值是相同的，最后一个则会在原基础上偏移4个字节，这是因为static_cast计算了父子类指针转换的偏移量，
+				并将之转换到正确的地址（c里面有m_a,m_b，转换为B*指针后指到m_b处），而reinterpret_cast却不会做这一层转换。
+				
+--------------c++强制转换注意事项
+				新式转换较旧式转换更受欢迎。原因有二，
+					一是新式转型较易辨别，能简化“找出类型系统在哪个地方被破坏”的过程；
+					二是各转型动作的目标愈窄化，编译器愈能诊断出错误的运用。
+				尽量少使用转型操作，尤其是dynamic_cast，耗时较高，会导致性能的下降，尽量使用其他方法替代。
+							
+***************理解虚函数表******************************************************************************************************************************************
+
+					class VirtualClass
+					{
+					public:
+
+						VirtualClass() {}
+						~VirtualClass() {}
+
+						virtual void VBasePrint()
+						{
+							printf("VBasePrint\n");
+						}
+
+						virtual void VBasePrint2()
+						{
+							printf("VBasePrint2\n");
+						}
+
+						void PrintClassAddress()
+						{
+							printf("VirtualClass %p %p \n", this, &(this->m_a));
+						}
+
+						int m_a;
+					};
+
+					VirtualClass* v_class = new VirtualClass();
+					v_class->m_a = 100;
+
+					v_class->PrintClassAddress();
+					int*** tmp_ptr = reinterpret_cast<int***>(v_class);		//
+					int** tmp_ptr2 = *tmp_ptr;								//对象或（对象存储虚函数指针）虚函数表起始地址
+					tmp_ptr2 += 1;											//
+					int* tmp_ptr3 = *tmp_ptr2;								//
+
+					//同等以上
+					int** tmp = reinterpret_cast<int**>(v_class);			//将对象看着一个虚函数表对象
+					int* v_ptr = *tmp;										//（存储虚函数指针）虚函数表起始地址
+					v_ptr += 1;												//第二个虚函数地址
+
+
+					VBasePrintFunc* func1 = (VBasePrintFunc*)&(tmp_ptr3);
+					VBasePrintFunc* func1 = (VBasePrintFunc*)&(*v_ptr);
+					VBasePrintFunc func = &VirtualClass::VBasePrint;
+				//	(v_class->*func)();
+					(v_class->*(*func1))();
+	
+	*************右左法则*********
+	const char *p; 			//*p是const,p可变
+	const (char *) p;		//p是const,*p可变
+	char const *p;			//*p是const,p可变 -- 因为C++里面没有const*的运算符，所以const只能属于前面的类型
+	
+	char * const p; 			//p是const,*p可变
+	const char * const p; 	//p和*p都是const
+	
+	注意 static 变量使用前 memset 防止使用上一次数据(在函数后面const 防止修改类成员变量)
+	
+************************************************************************************************
+	const数据成员只在某个对象生存期内是常量，而对于整个类而言却是可变的。因为类可以创建多个对象，不同的对象其const数据成员的值可以不同。所以不能在类声明中初始化const数据成员，
+	因为类的对象未被创建时，编译器不知道const 数据成员的值是什么，例如：
+	class A
+	{
+		const int size = 100; //错误
+		int array[size];       //错误，未知的size
+	}
+	
+	在C++中，mutable也是为了突破const的限制而设置的。被mutable修饰的变量，将永远处于可变的状态，即使在一个const函数中
+	
+	4.	pair<map<int, string>::iterator, bool> Insert_Pair;
+			Insert_Pair = mapStudent.insert(map<int, string>::value_type (1, "student_one"));
+			我们通过pair的第二个变量来知道是否插入成功，它的第一个变量返回的是一个map的迭代器，如果插入成功的话Insert_Pair.second应该是true的，否则为false。
+	
+	5.运算符优先级：
+			
+		记忆方法：（以下是C语言的优先级,与C++差别，记住C语言的，然记住和C++的几个差别就行了....）
+			括号成员第一; 														//括号运算符[]() 成员运算符. ->
+		　　全体单目第二; 														//所有的单目运算符比如++ -- +(正) -(负) 指针运算*&
+		　　乘除余三,加减四; 													//这个"余"是指取余运算即%
+		　　移位五，关系六; 													//移位运算符：<< >> ，关系：> < >= <= 等
+		　　等于(与)不等排第七; 												//即== !=
+		　　"三分天下"八九十;
+		　　位与异或和位或; 													//这几个都是位运算: 位与(&)异或(^)位或(|)
+		　　逻辑或跟与; 														//逻辑运算符:|| 和 &&
+		　　十二和十一; 														//注意顺序:优先级(||) 低于 优先级(&&)
+		　　条件高于赋值, //三目运算符优先级排到 13 位只比赋值运算符和","高		//需要注意的是赋值运算符很多！
+		　　逗号运算级最低! 													//逗号运算符优先级最低
+		
+	7. 在类内声明同时定义的函数被(默认)成内联函数 或者 用inline声明的；但不一定为内联，是否内联取决于编译器（forceinline）
+	
+	8. 关于默认参数：一旦有默认参数，默认参数之后的参数也必须是默认参数
+	
+	9.TCHAR* ptch = TEXT("This is a const string.");
+			如果使用UNICODE字符集， 则TEXT("This is a const string.")相当于L"This is a const string."， 
+			如果使用ASCII集， 则上述字符串相当于“This is a const string.”。这样， 写的程序既可以使用UNICODE， 也可以使用ASCII， 增强了移植性。
+			在写windows应用程序时， 如果您不确定使用UNICODE还是ASCII好， 那么推荐您使用TCHAR来替代程序中的char和wchar_t，同时对于字符串常量使用TEXT宏（或_T宏）。
+			
+	10.strtok()用来将字符串分割成一个个片段。参数s指向欲分割的字符串，参数delim则为分割字符串中包含的所有字符。
+		当strtok()在参数s的字符串中发现参数delim中包含的分割字符时,则会将该字符改为\0 字符。在第一次调用时，strtok()必需给予参数s字符串，往后的调用则将参数s设置成NULL。
+		每次调用成功则返回:指向被分割出片段的指针
+		int ParseCommandParam(char *src, char **result, const char *spilt)
+		{
+			int arg_num = 0;
+	
+			static char temp[Protocol::MAX_GM_COMMAND_LEN] = {0};  // 必须是static  
+
+			STRNCPY(temp, src, sizeof(temp));
+
+			char *token = strtok(temp, spilt);
+
+			while (NULL != token)
+			{
+				result[arg_num++] = token;
+				token = strtok(NULL, spilt);
+			}
+
+		return arg_num;
+	}
+			
+	11.编译器根据文件修改时间和文件内容是否改变来编译文件 -- 不用每次都重新生成 (增量链接)
+	
+	12.一个集合（set）是一个容器，它其中所包含的元素的值是唯一的：具体实现采用了红黑树的平衡二叉树的数据结构
+	
+	13.map：map内部自建一颗红黑树（一种非严格意义上的平衡二叉树）这颗树具有对数据自动排序的功能，所以在map内部所有的数据都是有序的，后边我们会见识到有序的好处。
+	find:使用二分查找
+	
+==========================================================================================================	
+	需要多了解STL不常用但很有用的算法：std::map upper_bound lower_bound;只返回大于或小于的迭代器
+	需要多研究源码（标准库的代码，编译器目录下source）
+===========================================================================================================
+	
+	14.红黑二叉树
+		做ACM的都用过STL里面的map和set，这在STL源码里面就是用红黑树来实现的，红黑树是一种自平衡二叉查找树，和上篇说到的Treap不同，红黑树通过对任何一条从根到叶子的路径上各个节点着色的方式限制，
+		从而红黑树能确保没有一条路径会比其他路径长两倍，因此它是接近平衡的，但是不能确保完全严格的平衡。
+		下面来介绍红黑树是怎样来实现自平衡的和它为什么叫红黑树：
+		红黑树每个节点包含五个域：color，key，left，right，parent。如果某节点没有一个子节点或父节点，那么该节点相应指针parent包含值NIL。NIL称作指向二叉查找树的外节点（叶子）的指针，
+		而把带关键字的节点称作内节点。
+		红黑树定义：
+		
+			1. 任何一个节点都被着色――红色或是黑色。
+
+			2. 根节点是黑色的。
+
+			3. 所有的NIL节点都看成黑色（NIL节点是就是一个假想的或是无实在意义的节点，所有应该指向NULL的指针，都看成指向了NIL节点。包括叶节点的子节点指针或是根节点的父指针）。
+
+			4. 如果一个节点是红色的，那么它的子节点一定是黑色的。
+
+			5. 对于任何一个节点而言，从该节点到它的子孙节点中的NIL节点路径中，所包含的黑节点个数相同。
+	
+		二叉树树的遍历：先序遍历，中序遍历， 后序遍历
+		普通树的遍历：广度优先、深度优先
+		
+		二叉树一个特性：每个点下的左子树以及分支必比这个点小；同理右子树比这个点大
+		
+		二叉树中有两种比较完美的类型，“完全二叉树”和“满二叉树”。
+          <1>  满二叉树    
+            除叶子节点外，所有节点的度都为2，文章开头处的树就是这里的“满二叉树”。
+
+          <2>  完全二叉树
+			必须要满足两个条件就即可：  干掉最后一层，二叉树变为“满二叉树”。最后一层的叶节点必须是“从左到右”依次排开。
+			我们干掉文章开头处的节点“F和”G",此时还是“完全二叉树”，但已经不是“满二叉树”了，你懂的。
+			
+			完全二叉树满足i节点下的左右节点分别是2*i + 1, 2*i +2(使用数学归纳证明)
+			
+			i：
+			2*i, 2*i+ 1
+
+			i+1:
+			下个节点的子节点与上个节点的子节点差1故i+1的子节点为：2*i +1, 2*i+2;
+			简化可得2*i, 2(i+1);
+					
+	K-D树：
+		Kd-树是K-dimension tree的缩写，是对数据点在k维空间（如二维(x，y)，三维(x，y，z)，k维(x1，y，z..)）中划分的一种数据结构，
+		主要应用于多维空间关键数据的搜索（如：范围搜索和最近邻搜索）。本质上说，Kd-树就是一种平衡二叉树。
+	 
+	八叉树：
+		实现八叉树的原理 
+
+	　　(1). 设定最大递归深度。
+
+	　　(2). 找出场景的最大尺寸，并以此尺寸建立第一个立方体。
+
+	　　(3). 依序将单位元元素丢入能被包含且没有子节点的立方体。
+
+	　　(4). 若没达到最大递归深度，就进行细分八等份，再将该立方体所装的单位元元素全部分担给八个子立方体。
+		(5).若发现子立方体所分配到的单位元元素数量不为零且跟父立方体是一样的，则该子立方体停止细分，因为跟据空间分割理论，细分的空间所得到的分配必定较少，若是一样数目，则再怎么切数目还是一样，会造成无穷切割的情形。
+
+	　　(6). 重复3，直到达到最大递归深度。
+	
+-----------------------------------------------------------------------------------------------------------------
+	
+	6个二维数据点{(2,3)，(5,4)，(9,6)，(4,7)，(8,1)，(7,2)}构建kd树的具体步骤为：
+		确定：split域=x。具体是：6个数据点在x，y维度上的数据方差分别为39，28.63，所以在x轴上方差更大，故split域值为x；
+		
+		确定：Node-data = （7,2）。具体是：根据x维上的值将数据排序，6个数据的中值(所谓中值，即中间大小的值)为7，所以Node-data域位数据点（7,2）。
+		这样，该节点的分割超平面就是通过（7,2）并垂直于：split=x轴的直线x=7；
+		
+		确定：左子空间和右子空间。具体是：分割超平面x=7将整个空间分为两部分：x<=7的部分为左子空间，包含3个节点={(2,3),(5,4),(4,7)}；
+		另一部分为右子空间，包含2个节点={(9,6)，(8,1)}；
+		
+		如上算法所述，kd树的构建是一个递归过程，我们对左子空间和右子空间内的数据重复根节点的过程就可以得到一级子节点（5,4）和（9,6），
+		同时将空间和数据集进一步细分，如此往复直到空间中只包含一个数据点。
+					 
+	
+	15.在函数最后面加上const
+	例：void GetBlackList(BlacklistsParam * black_list_param) const;
+	
+	这样的函数叫常成员函数。常成员函数可以理解为是一个“只读”函数，它既不能更改数据成员的值，也不能调用那些能引起数据成员值变化的成员函数，只能调用const成员函数。
+	
+	16. WinSock2 头文件冲突 -- 调换头文件引用顺序	（先包含winsock2 再包含windows.h）
+	
+			 主要原因是因为<windows.h>中包含了<winsock.h>头文件,由于其版
+			 本的不同，导致出现上述的错误。<windows.h>中相关代码如下:
+			 
+			   #ifndef WIN32_LEAN_AND_MEAN 
+               #include <cderr.h> 
+               #include <dde.h> 
+               #include <ddeml.h> 
+               ........ 
+                #ifndef _MAC 
+               #include <winperf.h> 
+               #include <winsock.h> 
+               #endif 
+                ....... 
+               #include <commdlg.h> 
+               #endif 
+               #endif
+	
+	17. 数组作为参数
+	
+		sizeof(数组名)：当数组名作为参数时退化为指针此时sizeof()是指针长度，其它时候sizeof()是数组长度
+		
+		在 C++中，数组永远不会按值传递，它是传递第一个元素，准确地说是第 0个 的指针
+		(1) void foo(int a[], int n)
+
+		(2) 另外一种机制是将参数声明为数组的 -- 引用
+			当参数是一个数组类型的引用时，数组长度成为参数和实参类型的一部分，编译器检查数组实参的长度与在函数参数类型中指定的长度是否匹配。 
+			// 参数为 10 个 int 的数组 
+			// parameter is a reference to an array of 10 ints 
+			void putValues( int (&arr)[10] );//不能写成&arr[10]，因为下标操作符的优先级较高 -- 括号、[]优先等级高然后再是单目操作符
+			int main()
+			{ 
+				int i, j[ 2 ]; 
+				putValues( i ); // 错误: 实参不是 10 个 int 的数组 
+				putValues( j ); // 错误: 实参不是 10 个 int 的数组 
+				return 0; 
+			}
+			
+		(3) template < int N >
+			void fun(int (&arr)[N]);
+			这样，任意大小的int型数组都可以传递进来了
+			这个方法叫“非类型模版参数”
+			
+		(4)在栈内存的数组（n维）其实都是连续的地址，堆分配的数据时如何决定
+	18.
+		稳定排序和不稳定排序：
+		稳定排序算法会依照相等的关键（换言之就是值）维持纪录的相对次序。一个排序算法是稳定的，就是当有两个有相等关键的纪录R和S，且在原本的串列中R出现在S之前，
+		在排序过的串列中R也将会是在S之前
+		
+		sort、qsort只能对线性存储结构进行排序，因为按照数组指针取值！！！
+		比较函数返回值大于0则交换顺序，所以默认是升序排列
+		
+		sort:通过  堆排序  实现？
+					void _Sort(_RanIt _First, _RanIt _Last, _Diff _Ideal, _Pr _Pred)
+					{	// order [_First, _Last), using _Pred
+					_Diff _Count;
+					for (; _ISORT_MAX < (_Count = _Last - _First) && 0 < _Ideal; )
+						{	// divide and conquer by quicksort
+						pair<_RanIt, _RanIt> _Mid =
+							_Unguarded_partition(_First, _Last, _Pred);
+						_Ideal /= 2, _Ideal += _Ideal / 2;	// allow 1.5 log2(N) divisions
+
+						if (_Mid.first - _First < _Last - _Mid.second)	// loop on larger half
+							_Sort(_First, _Mid.first, _Ideal, _Pred), _First = _Mid.second;
+						else
+							_Sort(_Mid.second, _Last, _Ideal, _Pred), _Last = _Mid.first;
+						}
+
+					if (_ISORT_MAX < _Count)
+						{	// heap sort if too many divisions
+						std::make_heap(_First, _Last, _Pred);
+						std::sort_heap(_First, _Last, _Pred);
+						}
+					else if (1 < _Count)
+						_Insertion_sort(_First, _Last, _Pred);	// small, insertion sort
+					}
+		
+		qsort（quicksort）主要根据你给的比较条件给一个快速排序，主要是通过指针移动实现排序功能。排序之后的结果仍然放在原来数组中。
+		
+		
+			void __fileDECL qsort (
+				void *base,
+				size_t num,
+				size_t width,
+				int (__fileDECL *comp)(const void *, const void *)
+			)
+			
+			    char* lo = static_cast<char*>(base);
+				char* hi = static_cast<char*>(base) + width * (num-1);
+				
+*************************************comp(lo, hi, width); //lo hi 均为数组的指针,而数组元素是指针，所以传入的是指针的指针
+			
+		
+		qsort之类的排序算法中比较函数原型（比较函数里面先强转为元素的指针 -- 过指针移动实现排序功）为：
+		
+			int (*fcmp)(const void * v1,const void * v2));
+			列如：
+				int QSortCmp(const void* v1, const void* v2)
+				{
+					int* a = (int*) v1; -- 此时 数组元素为int值
+															-- 当数组元素为int* 时用 int* v1 = *((int**) v1);
+					int* b = (int*) v2;
+					if ((*a) > (*b)) --- 升序, 降序 -- return *b - *a //
+					{
+						return 1;
+					}
+					return -1;
+				}
+				
+		sort:
+			  std::vector<int> myvector (myints, myints+8);               // 32 71 12 45 26 80 53 33
+
+			  // using default comparison (operator <):
+			  std::sort (myvector.begin(), myvector.begin()+4);           //(12 32 45 71)26 80 53 33
+
+			  // using function as comp
+			  std::sort (myvector.begin()+4, myvector.end(), myfunction); // 12 32 45 71(26 33 53 80)
+
+			  // using object as comp
+			  std::sort (myvector.begin(), myvector.end(), myobject);     //(12 26 32 33 45 53 71 80) 
+			  
+			  可以重载< 、>运算符来实现升降序(使用默认比较函数)：
+				例如：
+				bool operator <(const RankDataItem &other) const
+				{
+					return total_chongzhi > other.total_chongzhi;
+				}
+
+		
+	19.typedef : 理解复杂声明可用的“右左法则”：从变量名看起，先往右，再往左，碰到一个圆括号就调转阅读的方向；
+		括号内分析完就跳出括号，还是按先右后左的顺序，如此循环，直到整个声明分析完
+		
+		对已有的类型：
+		typedef 旧类型 新别名
+		
+		对于结构体：
+		struct A 
+		{
+			int xx;
+			int bb;
+		};
+		
+		typedef struct A 别名
+		或者
+		typedef struct A 			
+		{
+			int xx;
+			int bb;
+		}new_name;
+		亦或
+		typedef struct {
+			int xx;
+			int bb;
+		}new_name;
+
+		1.
+		记住，typedef是定义了一种类型的新别名，不同于宏，它不是简单的字符串替换。比如：
+		先定义：
+		typedef char* PSTR;
+		然后：
+		int mystrcmp(const PSTR, const PSTR);
+
+		const PSTR实际上相当于const char*吗？不是的，它实际上相当于char* const。（区别请看另一篇博文：const char*, char const*, char*const的区别 ）
+
+		原因在于const给予了整个指针本身以常量性，也就是形成了常量指针char* const。
+
+		简单来说，记住当const和typedef一起出现时，typedef不会是简单的字符串替换就行
+		
+		2.
+		typedef在语法上是一个存储类的关键字（如auto、extern、mutable、static、register等一样），虽然它并不真正影响对象的存储特性，如：
+		typedef static int INT2; //不可行
+		编译将失败，会提示“指定了一个以上的存储类”。
+		
+		3.
+		通常讲，typedef要比#define要好，特别是在有指针的场合。请看例子：
+
+		typedef char *pStr1;
+
+		#define pStr2 char *;
+
+		pStr1 s1, s2;
+
+		pStr2 s3, s4;
+
+		在上述的变量定义中，s1、s2、s3都被定义为char *，而s4则定义成了char，不是我们所预期的指针变量，根本原因就在于#define只是简单的字符串替换而typedef则是为一个类型起新名字。
+		
+		若要了解有关 Visual Studio 2017 RC 的最新文档，请参阅 Visual Studio 2017 RC 文档。
+		四个预处理器特定运算符在 #define 指令的上下文中使用（参见下面的对每一个的摘要的列表)。 字符串话、字符化和标记粘贴运算符在接下来的三个部分中讨论。 有关已定义运算符的信息，请参见 #if、 #elif、 #else 和 #endif 指令。
+		运算符	操作
+		字符串化运算符 （#）	导致对应的实参括在双引号内（把参数字符串化）
+		#include <stdio.h>  
+		#define stringer( x ) printf_s( #x "\n" )  
+		int main() {  
+		   stringer( In quotes in the printf function call );   
+		   stringer( "In quotes when printed to the screen" );     
+		   stringer( "This: \"  prints an escaped double quote" );  
+		}  
+		
+		Charizing 运算符 (#@)	导致对应的参数括在单引号内且其被认为是字符 （Microsoft 特定）
+		标记粘贴运算符 (##)	允许用作实参的标记串联以形成其他标记
+			#define REGISTER_MEMPOOL(PoolNameSpace, ClassName, INCREASE_NUM, ClassNameStr) \
+			namespace PoolNameSpace\
+			{\
+				MemPool g_##ClassName##_mem_pool(sizeof(ClassName), INCREASE_NUM, ClassNameStr);\
+			}\
+		
+		定义的运算符	简化在特定宏指令的复合表达式的书写。
+
+	20.memset 原理：当设置为0时使用: xor自身（异或位运算快）：作用是在一段内存块中填充某个给定的值，它是对较大的结构体或数组进行清零操作的一种最快方法
+	memset初始化值为-1时，也没问题（char -1:补码表示 : 1111 1111, int -1b补码也是: 1111.... 1111）->取出来表示时都是1000...1(只能设置所有位相同的才有效！！)
+	Sets the first num bytes of the block of memory pointed by ptr to the specified value (interpreted as an unsigned char).
+
+	《特别注意::因为memset是以字节为单位的。不能对非一个字节的数据进行初始化话为非零时》
+	
+	21.最大/小子序列和：一个数组中，其中连续几个数的的最大/小和
+		example：
+			-2,11,-4,13,-5,-2: 最大子序列为:11,-4,13 = 20 最小子序列：-5，-2 = -7
+			穷举法:
+				long maxSubSum2(const vector<int>& a) 
+				{ 
+					   long maxSum = 0; 
+					   for (int i = 0; i < a.size(); i++) 
+					   { 
+							  long thisSum = 0; 
+							  for (int j = i; j < a.size(); j++) 
+							  { 
+									 thisSum += a[j]; 
+									 if (thisSum > maxSum) 
+											maxSum = thisSum; 
+							  } 
+					   } 
+					   return maxSum; 
+				}
+				
+	
+	22. unsigned int: -1 等于 unsigned int 最大值(计算机补码方式存储 = 反码 + 1) 
+	
+		unsigned int u_a = 1;
+		unsigned int u_b = 2;
+		{
+			printf("str : [%ud]", u_a - u_b);		//溢出将会是一个很大很大的数
+		}
+		
+	23. localtime与localtime_r区别：
+		localtime()返回一个内部静态变量指针，是线程不安全的。
+		localtime_r()是线程安全的版本，可是Windows上没有
+		
+	23.浅拷贝与深拷贝-------------拷贝构造函数不能由成员函数模版生成. 
+		class Handle
+		{
+			private:
+				string name;
+				X* p;
+			public:
+				Handle(string n):name(n), p(0) { /* acquire X called "name" and let p point to it */ }
+				~Handle() { delete p; /* release X called "name" */ }
+						// ...
+		};
+
+		void f(const string& hh)
+		{
+			Handle h1(hh);
+			Handle h1 = h2; // 会引起灾难！
+			// ...
+		}
+
+        在此，默认复制构造函数使得 h2.name==h1.name 并且 h2.p==h2.p。这将导致一场灾难：当函数 f() 运行结束时，会调用 h1 和 h2 的析构函数，这就导致 h1.p 和 h2.p 所指向的对象被 delete 了两次。
+
+        如何避免这场灾难？最简单的办法是，将复制构造函数和赋值运算符声明为私有成员，从而关闭复制机制：
+
+        class Handle 
+		{
+            private:
+				string name;
+                X* p;
+
+                Handle(const Handle&); // 阻止复制
+                Handle& operator=(const Handle&);
+            public:
+                Handle(string n):name(n), p(0) { /* acquire the X called "name" and let p point to it */ }
+                ~Handle() { delete p; /* release X called "name" */ }
+                  // 
+		}
+		
+		
+		隐式转换问题；
+		当构造函数传递参数只需一个时， class T = 1或"a"或'a'都会隐式转换
+		
+		class CxString  // 没有使用explicit关键字的类声明, 即默认为隐式声明  
+		{  
+		public:  
+			char *_pstr;  
+			int _size;  
+			CxString(int size)  
+			{  
+				_size = size;                // string的预设大小  
+				_pstr = malloc(size + 1);    // 分配string的内存  
+				memset(_pstr, 0, size + 1);  
+			}  
+			CxString(const char *p)  
+			{  
+				int size = strlen(p);  
+				_pstr = malloc(size + 1);    // 分配string的内存  
+				strcpy(_pstr, p);            // 复制字符串  
+				_size = strlen(_pstr);  
+			}  
+			// 析构函数这里不讨论, 省略...  
+		};  
+  
+    // 下面是调用:  
+  
+    CxString string1(24);     // 这样是OK的, 为CxString预分配24字节的大小的内存  
+    CxString string2 = 10;    // 这样是OK的, 为CxString预分配10字节的大小的内存  
+    CxString string3;         // 这样是不行的, 因为没有默认构造函数, 错误为: “CxString”: 没有合适的默认构造函数可用  
+    CxString string4("aaaa"); // 这样是OK的  
+    CxString string5 = "bbb"; // 这样也是OK的, 调用的是CxString(const char *p)  
+    CxString string6 = 'c';   // 这样也是OK的, 其实调用的是CxString(int size), 且size等于'c'的ascii码  
+    string1 = 2;              // 这样也是OK的, 为CxString预分配2字节的大小的内存  
+    string2 = 3;              // 这样也是OK的, 为CxString预分配3字节的大小的内存  
+    string3 = string1;        // 这样也是OK的, 至少编译是没问题的, 但是如果析构函数里用free释放_pstr内存指针的时候可能会报错, 完整的代码必须重载运算符"="(防止这种赋值或构造), 并在其中处理内存释放 
+	
+	explicit 用于声明构造函数不能隐式转换****************************************
+		
+	24. <<指针>>
+		char** p = char* arr[] = arr1[][];(main函数参数)
+		
+		    // 第一种初始化方法
+			char **p = new char *[10];
+			// 赋值后正常使用
+			p[0] = "aaa";
+			cout<<p[0]<<endl;
+			// 值可以改变
+			p[0] = "bbb";
+			// 未赋值使用会崩。编译能过。
+			//cout<<p[1]<<endl;
+			// 越界赋值，编译能过，运行能过，输出时崩。
+			//p[100] = "ccc";
+			//cout<<p[100]<<endl;
+
+			// 第二种初始化方法
+			unsigned int i = 0;
+			char** pP = NULL;
+			pP = (char**)calloc(128, sizeof(char*));
+			for (i = 0; i < 128; ++i)
+			{
+				pP[i] = (char*)calloc(128, sizeof(char));
+			}
+			// 这种初始化方法，好像不存在越界。
+			pP[1000] = "ddd";
+			cout<<pP[1000]<<endl;
+			
+			int ** p(p指向的是一个二维数组的开头指针) = int p[][](每个元素都是一个int) ->(转化) int * p[];(每个元素指向一个一维数组的开头指针)
+			二维数组行列map[height][width]
+			
+	25.switch 细节：
+			switch会从满足条件的地方开始执行,直到遇到break;语句或执行完switch语句为止！！！！！！！！
+			具体地说，switch...case会生成一份大小（表项数）为最大case常量＋1的跳表，程序首先判断switch变量是否大于最大case 常量，若大于，则跳到default分支处理；否则取得索引号为switch变量大小的跳表项的地址（即跳表的起始地址＋表项大小＊索引号），程序接着跳到此地址执行，到此完成了分支的跳转
+			
+	26.简单说一下Dump文件的用法:
+		将Dump文件拷贝到含有应用程序和对应的pdb文件的目录，在VS里面打开Dump文件（或者直接双击Dump文件），VS会自动创建一个Solution，直接调试运行，
+		代码就会停到使程序崩溃的那一行上。就跟在VS里面调试代码一摸一样。（VS2008）
+		
+	27.template模板使用：
+			(1)类型参数模板:template <typename T>
+			(2)非类型参数模板
+			(3)模板的默认模板类型形参:template <typename T, typename A=int>
+		stl模板，当使用std容器多了，模板特例化多了，会增加生产的exe二进制代码量！！！！（容器的每一种类型特例化一次）
+		所以用容器保存指针才是一种很好的做法，报错对象：首先容器使用的是副本，其次特例化多，代码体积增大！！
+			
+	28.无符号整型(不要使用 uint32_t 等无符号整型，除非你是在表示一个位组（bit pattern）而不是一个数
+		值。即使数值不会为负值也不要使用无符号类型，使用断言（assertion，译者注，这一点
+		很有道理，计算机只会根据变量、返回值等有无符号确定数值正负，仍然无法确定对错）来
+		保护数据)
+		有些人，包括一些教科书作者，推荐使用无符号类型表示非负数，类型表明了数值取值形式 。
+		但是，在 C 语言中，这一优点被由其导致的 bugs 所淹没。
+		看看：
+			for (unsigned int i = foo.Length()-1; i >= 0; --i) ... //应该 = 0 不能进去循环就没问题
+		上述代码永远不会终止！有时 gcc 会发现该 bug 并报警，但通常不会。类似的 bug 还会出
+		现在比较有符合变量和无符号变量时，主要是 C 的类型提升机制（type-promotion
+		scheme，C 语言中各种内建类型之间的提升转换关系）会致使无符号类型的行为出乎你的
+		意料。
+		
+	29.c++ 宏：我们使用#把宏参数变为一个字符串,用##把两个宏参数贴合在一起， “\”  在宏定义中为续行符！！！
+	案例分析：#define REGISTER_MEMPOOL(PoolNameSpace, ClassName, INCREASE_NUM, ClassNameStr) \
+			namespace PoolNameSpace\
+			{\
+				MemPool g_##ClassName##_mem_pool(sizeof(ClassName), INCREASE_NUM, ClassNameStr);\
+			}\
+		
+		g_##ClassName##_mem_pool：通过##拼接字符串，让之成为一个独一无二的对象名
+		
+		一、一般用法
+		我们使用#把宏参数变为一个字符串,用##把两个宏参数贴合在一起.
+		用法:
+		＃i nclude<cstdio>
+		＃i nclude<climits>
+		using namespace std; 
+		#define STR(s)      #s
+		#define CONS(a,b)  int(a##e##b)
+		int main()
+		{
+			printf(STR(vck));            // 输出字符串"vck"
+			printf("%d\n", CONS(2,3));  // 2e3 输出:2000
+			return 0;
+		}
+
+		二、当宏参数是另一个宏的时候
+		需要注意的是凡宏定义里有用'#'或'##'的地方宏参数是不会再展开.
+
+		1, 非'#'和'##'的情况
+		#define TOW      (2)
+		#define MUL(a,b) (a*b)
+
+		printf("%d*%d=%d\n", TOW, TOW, MUL(TOW,TOW));
+		这行的宏会被展开为：
+		printf("%d*%d=%d\n", (2), (2), ((2)*(2)));
+		MUL里的参数TOW会被展开为(2).
+
+		2, 当有'#'或'##'的时候
+		#define A          (2)
+		#define STR(s)      #s
+		#define CONS(a,b)  int(a##e##b)
+
+		printf("int max: %s\n",  STR(INT_MAX));    // INT_MAX ＃i nclude<climits>
+		这行会被展开为：
+		printf("int max: %s\n", "INT_MAX");
+
+		printf("%s\n", CONS(A, A));                // compile error 
+		这一行则是：
+		printf("%s\n", int(AeA));
+
+		INT_MAX和A都不会再被展开, 然而解决这个问题的方法很简单. 加多一层中间转换宏.
+		加这层宏的用意是把所有宏的参数在这层里全部展开, 那么在转换宏里的那一个宏(_STR)就能得到正确的宏参数.
+
+		#define A            (2)
+		#define _STR(s)      #s
+		#define STR(s)      _STR(s)          // 转换宏
+		#define _CONS(a,b)  int(a##e##b)
+		#define CONS(a,b)    _CONS(a,b)        // 转换宏
+
+		printf("int max: %s\n", STR(INT_MAX));          // INT_MAX,int型的最大值，为一个变量 ＃i nclude<climits>
+		输出为: int max: 0x7fffffff
+		STR(INT_MAX) -->  _STR(0x7fffffff) 然后再转换成字符串；
+
+		printf("%d\n", CONS(A, A));
+		输出为：200
+		CONS(A, A)  -->  _CONS((2), (2))  --> int((2)e(2))
+		
+	30.std::istringstream -- istringstream对象可以绑定一行字符串，然后以空格为分隔符把该行分隔
+	由于stringstream构造函数会特别消耗内存，似乎不打算主动释放内存(或许是为了提高效率)，但如果你要在程序中用同一个流，反复读写大量的数据，将会造成大量的内存消耗，因些这时候，需要适时地清除一下缓冲 (用 stream.str("") )。
+	
+	31.<<.h 与.hpp>>
+		1、是Header   Plus   Plus 的简写。
+
+		2、与*.h类似，hpp是C++程序头文件 。
+
+		3、是VCL专用的头文件,已预编译。
+
+		4、是一般模板类的头文件。
+
+		5、一般来说，*.h里面只有声明，没有实现，而*.hpp里声明实现都有，后者可以减少.cpp的数量。
+
+		6、*.h里面可以有using   namespace   std，而*.hpp里则无。
+	
+		7.   a)不可包含全局对象和全局函数
+				由于hpp本质上是作为.h被调用者include，所以当hpp文件中存在全局对象或者全局函数，而该hpp被多个调用者include时，将在链接时导致符号重定义错误。
+				要避免这种情况，需要去除全局对象，将全局函数封装为类的静态方法
+			 b)类之间不可循环调用
+			 c)不可使用静态成员
+				静态成员的使用限制在于如果类含有静态成员，则在hpp中必需加入静态成员初始化代码，当该hpp被多个文档include时，将产生符号重定义错误。
+				唯一的例外是const static整型成员，因为在vs2003中，该类型允许在定义时初始化
+				
+	32.ANSI标准说明了五个预定义的宏名。它们是：
+			__LINE__
+			__FILE__
+			__DATE__
+			__TIME__
+			__STDC__
+
+			如果编译不是标准的，则可能仅支持以上宏名中的几个，或根本不支持。记住编译程序 也许还提供其它预定义的宏名。
+			是行连接符，会将下一行和前一行连接成为一行，即将物理上的两行连接成逻辑上的一行
+			__FILE__ 是内置宏 代表源文件的文件名
+			__LINE__ 是内置宏，代表该行代码的所在行号
+			__DATE__宏指令含有形式为月/日/年的串，表示源文件被翻译到代码时的日期。
+			源代码翻译到目标代码的时间作为串包含在__TIME__ 中。串形式为时：分：秒。
+			如果实现是标准的，则宏__STDC__含有十进制常量1。如果它含有任何其它数，则实现是非标准的。
+			
+	33.重载运算符
+		
+		1、只有C++预定义的操作符才可以被重载；
+		2、对于内置类型的操作符，它的预定义不能改变，即不能改变操作符原来的功能；
+		3、重载操作符不能改变他们的操作符优先级；
+		4、重载操作符不能改变操作数的个数；
+******	5、除了对()操作符外，对其他重载操作符提供缺省实参都是非法的； ****************
+	
+		    Test &operator ++();   //前增量
+
+			Test operator ++(int);//后增量，不能返回临时变量的引用
+			
+		==================================================================================
+		在阅读libc++中nullptr_t源码的时候，遇到了下面的关于运算符重载的用法。
+		 template <class _Tp>
+				_LIBCPP_ALWAYS_INLINE _LIBCPP_CONSTEXPR
+				operator _Tp* () const {return 0;}
+		_Tp 应该是一种类型，但是我从没有见到过这种使用方式，所以写一段代码实验一下。示例代码如下：
+
+		#include <iostream>
+		using namespace std;
+		class Base
+		{
+			int mem;
+		public:
+			Base() : mem(0) {}
+			int operator*() { return 1; };
+			operator int*() { return 0; }
+		};
+		int main()
+		{
+			Base b;
+			std::cout << "*b: " << *b << std::endl;
+			std::cout << "b: " << b << std::endl;
+			return 0;
+		}
+		上面的输出结果如下：
+		$ g++ test.cpp
+		// ---------- ouput --------
+		$ *b: 1
+		$ b: 0
+			
+	34.memcmp:把数据都看作char逐个比较,虽然 1 在int和char中是不同的二进制位，但把比较的两个内存都看作char ,相等的话，必定相等的二进制。
+	
+	35.memset绝对不能用于std::string(对象), memset()是对内存块进行赋值操作
+	
+	36.空类或结构体都会有1Byte大小：c++要求每个实例在内存中都有独一无二的地址。//注意这句话！！！！！！！！！！
+	空类也会被实例化，所以编译器会给空类隐含的添加一个字节，这样空类实例化之后就有了独一无二的地址了。所以空类的sizeof为1。
+	
+	37.之所以同类型的的最大值和最小值的绝对值差1因为计算机用补码进行存储（方便减法转换为加法），整数的补码、反码一样；
+	负数的反码：符号位为1，其他取反；负数的补码：符号位为1，其他取反，在末位+1（反码+1）-- +0和-0 都是0没必要，所以规定正0为0，负0为负的最小值1000...
+	
+	*******************************************************
+	对有符号的数取反（~）得到的结果不是想要的(不会用于数字)（计算机存储形式为补码（整数补码反码原码一样，负数补码=反码+1，反码 = 原码除符号位外取反））
+	int a = 1;
+	a = ~a；（在计算机内存储变成了，1111 1111 1111 1110(0xfffe)）变成负数的补码了显示出来就是：1000 0000 0000 0010 -》 -2！！！！！！！
+	
+	当在位标记时尽量不要用有符号型，有符号时激活最高位 a & (1<<31) > 0 （a&(1<<31)!=0没问题）时出问题；此时数已经是负数了，虽然最高位已经置1
+	
+	38.抽象不依赖于细节，细节依赖于抽象；针对接口编程而不是针对实现编程
+	
+	39. void关键字的使用规则：
+
+             1. 如果函数没有返回值，那么应声明为void类型；
+
+             2. 如果函数无参数，那么应声明其参数为void；
+
+             3. 如果函数的参数可以是任意类型指针，那么应声明其参数为void * ；
+
+              4. void不能代表一个真实的变量；
+
+		void体现了一种抽象，这个世界上的变量都是“有类型”的
+		
+	40.设计模式！！！！！（虚函数纯虚函数、类继承的运用）
+	
+	41.基础输出表示：
+		1.0e-5f 表示。1.0 * （10^-5）,用e 表示10 ， 加号表示正整数次方， 减号，表示负整数次方
+		
+		％d整型输出，％ld长整型输出，
+
+		％o以八进制数形式输出整数，
+
+		％x以十六进制数形式输出整数，
+
+		％u以十进制数输出unsigned型数据(无符号数)。
+
+		％c用来输出一个字符，
+
+		％s用来输出一个字符串，
+
+		％f用来输出实数，以小数形式输出，
+
+		％e以指数形式输出实数，
+
+		％g根据大小自动选f格式或e格式，且不输出无意义的零。
+	
+	42.	将某位置1 int a; a |= (1<<index);
+		将某位置0 a&=~(1<<index);
+		
+	43.
+	位段或位域
+         在前面已经提起过，在计算机中是采用二进制0和1来表示数据的，每一个0或者1占用1位（bit）存储空间，8位组成一个字节（byte），为计算机中数据类型的最小单位，
+		 如char在32bit系统中占用一个字节。但是正如我们知道的，有时候程序中的数据可能并不需要这么的字节，比如一个开关的状态，只有开和关，用1和0分别替代就可以表示。
+		 此时开关的状态只需要一位存储空间就可以满足要求。如果用一个字节来存储，显然浪费了另外的7位存储空间。所以在C语言中就有了位段（有的也叫位域，其实是一个东西）这个概念。
+		 具体的语法就是在变量名字后面，加上冒号(:)和指定的存储空间的位数。具体的定义语法如下：
+		 
+		9:  struct Node
+		{
+			char a:2;
+			double i;
+			int c:4;
+		}node;
+ 
+    其实定义很简单，上面示例的意义是，定义一个char变量a，占用2位存储空间，一个double变量i，以及一个占用4位存储的int变量c。
+	请注意这里改变了变量本来占用字节的大小,并不是我们常规定义的一个int变量占用4个字节，一个char变量占用1一个字节。但是sizeof(node) = ?呢，
+	在实际的运行环境中运行，得到sizeof(node) = 24；为什么呢？说起来其实也很简单，字节对齐，什么是字节对齐，待会下一个段落会具体讲解
+
+	44.待定
+		 
+	45.string 与char*
+	string 是类
+	char* 是一个指针
+	char* 能直接赋值给string
+	string通过.c_str()可以转换为char*
+	
+	46. if (a = 0) 相当于 if (a)
+		{
+			不进
+		}
+		
+		if (a = 1)
+		{	
+			进
+		}
+		
+	47.使用容器存储结构体时要存指针。容器赋值都是副本操作
+	
+	48.float\double : 浮点运算比整型慢(负次方是这个数的倒数): 存储float
+		（1）  阶码位0，尾数位0，那么这个浮点数表示0；
+
+		（2）  阶码位255，尾数位0，那么这个浮点表示无穷大；
+
+		（3）  阶码位255，尾数位不为0，那么这个是一个非法数。
+		
+		最高位位符号位，其次8位为指数位(指数位不用最高位来区分正负(0~255)，把127作为偏差值，超过127认为正指数，小于127负指数，最后23位为尾数位(实际上表示24位的精度:尾数必须是1.xxxx把最左边的1
+		去掉能够多存一位尾数)
+		float : 10.5 先转换为二进制 整数部分：1010 小数部分: 0.1 得出二进制 : 10,
+
+		小数转二进制：乘2取整法，即将小数部分乘以2，然后取整数部分，剩下的小数部分继续乘以2，然后取整数部分，剩下的小数部分又乘以2，一直取到小数部分 
+		为零为止。如果永远不能为零，就同十进制数的四舍五入一样，按照要求保留多少位小数时，就根据后面一位是0还是1，取舍，如果是零，舍掉，如果是1，向入一位。
+		换句话说就是0舍1入。读数要从前面的整数读到后面的整数
+		
+		科学计数法 
+		
+		
+		float f = 10 * 0.01f;	//结果会小于0.1f，由于0.1f 在计算机内存储为 精度原因结果只会0.099999...4f
+			
+	49.C/C++中near和far的区别
+	
+      关键字near和far受目标计算机体系结构的影响。目前编程中使用不多。
+      near关键字创建一个指向可寻址内存低端部分的目标指针。这些指针占用内存的单一字节，并且他们能够指向的内存单元被限制到256个位置，通常是在 0x0000~0x00ff范围中。
+      int near * ptr；
+      far关键字创建一个能够指向内存中任何数据的指针：
+      char far * ptr；
+	  near   (近)指针：16位段内偏移地址    
+	  far(远)指针：16位段地址＋16位段内偏移地址    
+	  huge(巨)指针：32位规格化的具有唯一性的内存地址  
+	  C语言的存贮属性由六种编译模式决定(参见TC集成环境菜单中的option->compiler->model选项)，默认的编译模式为 small,   在该编译模式下，指针的默认属性为near。
+	补充：near指针是16位指针，依赖一个段地址寄存器，指针变量就是位移量，利用段地址寄存器+指针 来寻址，所以有64K之限制。
+			 far 指针是32位指针，不但有16位的位移量，还有16位的段地址，但此指针有个缺陷，增量时只加到位移部分，一旦16位的位移量超过了FFFF就会回到这个 段地址的初始。
+			 所以，又引入了huge指针，huge指针与far一样，其区别仅在于使用了标准化的方法来表示，这样所有的地址都有一个唯一的表示方法，从而避免了 far指针的问题。
+			 空指针规定了一种指针状态，如果没有这个空指针，就如数字没有了0。
+			 
+			 
+	50.函数返回引用：
+	int & Get()...
+	如果不用引用接收就相当于返回值（副本）-- 如果返回类对象是临时变量，里面有指针，析构释放指针！！！！问题严重
+	如 int a = Get() 和 int &a = Get()..有区别
+	
+	C++规定是（除了main函数）不可以有默认返回值。C则没有强制这一点，如果没有return则返回eax寄存器里的东西
+	
+	51.mysql:
+	页：
+	数据页（b-tree node） Undo页（undo log page） 系统页（system page） 事务数据页（transaction system page） 
+	插入缓冲位图页(insert buffer bitmap) 插入缓冲空闲列表 （insert buffer free list） 未压缩的二进制大对象页（uncompressed blob page）
+	压缩的二进制大对象页（compressed blob page）
+	
+	行：每页最多存储16k/2~200行记录（B+树、二分查找）so 一条记录最大16/2 ~= 8k
+	
+	mysql转存数据时倒入失败有可能是mysql 配置 my.ini max_allowed_packet 太小的原因
+	
+	1）主键一定会创建一个唯一索引，但是有唯一索引的列不一定是主键；	
+	2）主键不允许为空值，唯一索引列允许空值；	
+	3）一个表只能有一个主键，但是可以有多个唯一索引；	
+	4）主键可以被其他表引用为外键，唯一索引列不可以；	
+	5）主键是一种约束，而唯一索引是一种索引，是表的冗余数据结构，两者有本质的差别
+	
+	InnoDB的行记录格式, Compact, Redundant, Compressed, Dynamic
+	
+	Compact行记录格式
+	Compact行记录是在MySQL 5.0时被引入的，其设计目标是能高效存放数据。简单来说，如果一个页中存放的行数据越多，其性能就越高。Compact行记录以如下方式进行存储： 
+
+	Compact行格式的首部是一个非NULL变长字段长度列表，而且是按照列的顺序逆序放置的。当列的长度小于255字节，用1字节表示，若大于255个字节，用2个字节表示，变长字段的长度最大不可以超过2个字节
+	（这也很好地解释了为什么MySQL中varchar的最大长度为65 535，因为2个字节为16位，即216=1=65 535）
+	
+	nnoDB Plugin引入了新的文件格式（file format，可以理解为新的页格式），对于以前支持的Compact和Redundant格式将其称为Antelope文件格式，新的文件格式称为Barracuda。Barracuda文件格式下拥有两种新的行记录格式Compressed和Dynamic两种。新的两种格式对于存放BLOB的数据采用了完全的行溢出的方式，在数据页中只存放20个字节的指针，实际的数据都存放在BLOB Page中，而之前的Compact和Redundant两种格式会存放768个前缀字节。
+	
+	Compressed行记录格式的另一个功能就是，存储在其中的行数据会以zlib的算法进行压缩，因此对于BLOB、TEXT、VARCHAR这类大长度类型的数据能进行非常有效的存储。
+	
+	
+	索引：
+	1.普通索引
+	2.唯一索引
+	3.主键索引
+	4.组合索引
+	5.全文索引
+	
+	使用索引时，有以下一些技巧和注意事项：
+		1.索引不会包含有null值的列只要列中包含有null值都将不会被包含在索引中，复合索引中只要有一列含有null值，那么这一列对于此复合索引就是无效的。所以我们在数据库设计时不要让字段的默认值为null。
+		
+		2.使用短索引对串列进行索引，如果可能应该指定一个前缀长度。例如，如果有一个char(255)的列，如果在前10个或20个字符内，多数值是惟一的，那么就不要对整个列进行索引。
+		短索引不仅可以提高查询速度而且可以节省磁盘空间和I/O操作。
+		
+		3.索引列排序查询只使用一个索引，因此如果where子句中已经使用了索引的话，那么order by中的列是不会使用索引的。因此数据库默认排序可以符合要求的情况下不要使用排序操作；尽量不要包含多个列的排序，如果需要最好给这些列创建复合索引。
+		
+		4.like语句操作
+		一般情况下不推荐使用like操作，如果非使用不可，如何使用也是一个问题。like “%aaa%” 不会使用索引而like “aaa%”可以使用索引。
+		
+		5.不要在列上进行运算
+		这将导致索引失效而进行全表扫描，例如
+
+		SELECT * FROM table_name WHERE YEAR(column_name)<2017;
+
+	
+	51.大端与小端
+		大端字节序：高位字节在前，低位字节在后，这是人类读写数值的方法。0x2211
+		小端字节序：低位字节在前，高位字节在后，即以0x1122形式储存。
+	首先，为什么会有小端字节序？
+		答案是，计算机电路先处理低位字节，效率比较高，因为计算都是从低位开始的。所以，计算机的内部处理都是小端字节序。
+		但是，人类还是习惯读写大端字节序。所以，除了计算机的内部处理，其他的场合几乎都是大端字节序，比如网络传输和文件储存。
+		
+	只有读取的时候，才必须区分字节序，其他情况都不用考虑。"
+		处理器读取外部数据的时候，必须知道数据的字节序，将其转成正确的值。然后，就正常使用这个值，完全不用再考虑字节序。
+		即使是向外部设备写入数据，也不用考虑字节序，正常写入一个值即可。外部设备会自己处理字节序的问题。
+	
+	52.WSAStartup（windows socket asynchronous）
+		当一个应用程序调用WSAStartup函数时，操作系统根据请求的Socket版本来搜索相应的Socket库，然后绑定找到的Socket库到该应用程序中。
+		以后应用程序就可以调用所请求的Socket库中的其它Socket函数了
+		
+	53.volatile应该用volatile声明，该关键字的作用是防止优化编译器把变量从内存装入CPU寄存器中。如果变量被装入寄存器，那么两个线程有可能一个使用内存中的变量，一个使用寄存器中的变量，
+	这会造成程序的错误执行。volatile的意思是让编译器每次操作该变量时一定要从内存中真正取出，而不是使用已经存在寄存器中的值.
+	
+	1) 中断服务程序中修改的供其它程序检测的变量需要加volatile； 
+	2) 多任务环境下各任务间共享的标志应该加volatile； 
+	3) 存储器映射的硬件寄存器通常也要加volatile说明，因为每次对它的读写都可能由不同意义
+	
+	
+	在C++中，mutable是为了突破const的限制而设置的。被mutable修饰的变量，将永远处于可变的状态，即使在一个const函数中，甚至结构体变量或者类对象为const，
+	其mutable成员也可以被修改, mutable在类中只能够修饰非静态数据成员
+	
+	54.
+		(1) 逗号表达式的运算过程为：从左往右逐个计算表达式。
+		(2) 逗号表达式作为一个整体，它的值为最后一个表达式（也即表达式n）的值。
+		(3) 逗号运算符的优先级别在所有运算符中最低。
+		
+	55.
+		边缘触发：通知一次，知道下可读写事件
+		水平触发: 一次事件没完成则一直通知
+	
+		select(),poll()模型都是水平触发模式，信号驱动IO是边缘触发模式，epoll()模型即支持水平触发，也支持边缘触发，默认是水平触发。
+		5种基本IO模型：
+			1.阻塞使I/O （blocking i/o）
+			2.非阻塞式I/O
+			3.I/O复用（select \poll \pselect）
+			4.信号驱动式I/O(SIGIO)
+			
+			//以上4种为同步IO ： 在没有可读写时做其他工作，有读写时执行读写再执行其他
+			
+			5.异步I/O（posix ai_o系列函数） ：可同时进行
+		
+		fcntl函数用于执行各种描述符控制操作；
+		int fcntl(int fd, int cmd, ..../*int argc*/)
+		cmd参数：F_GETFL \ F_SETFL \F_SETOWN \F_GETOWN
+		正确的设置代码如下：
+		int flag;
+		if (flag = fcntl(fd, F_GETFL, 0) < 0)
+		{
+			//handle error;
+		}
+		flag |= O_NONBLOCK\O_ASYNC\...(你想要设置的标记)
+		if (flag = fcntl(fd, F_SETFL, flag))
+		{
+			//handle error;
+		}
+		
+		如果直接设置状态，会清除原来的状态！
+		
+	56.I/O
+	
+		（1）全缓存:
+					在这种情况下，当填满标准I/O缓存后才进行实际I / O操作。对于驻在磁盘上的文件通常是由标准I/O库实施全缓存的。
+					在一个流上执行第一次 I/O操作时，相关标准I/O函数通常调用malloc获得需使用的缓存(fflush可刷新缓存写入)
+		（2）行缓存:
+				   1 缓冲区填满
+				   2 写入的字符中有‘\n’ '\r'
+				   3 调用fflush手动刷新缓冲区
+				   4 调用scanf要从缓冲区中读取数据时，也会将缓冲区内的数据刷新
+				   
+		（3）不缓存: write函数 read函数和标准错误输出stderr（其他读写函数都是缓存式）
+		
+	57.brk/sbrk则是实现malloc的底层函数，其中brk是系统调用。操作起来更为灵活，但很多人往往不容易理解。(brk和sbrk主要的工作是实现虚拟内存到内存的映射)
+	在VC里面，用release模式编译运行程序的时候，堆分配（Heapallocation）的时候调用的是malloc，如果你要分配10byte的空间，那么就会只分配10byte空间;
+	而用debug模式的时候，堆分配调用的是_malloc_dbg，如果你只要分配10byte的空间，那么它会分配出除了你要的10byte之外，还要多出约36byte空间\
+	
+	  On success, brk() returns zero.  On error, -1 is returned, and errno is set to ENOMEM.  (But see Linux Notes below.)
+
+      On  success,  sbrk()  returns the previous program break.  (If the break was increased, then this value is a pointer to the start of the newly allocated memory).  On
+       error, (void *) -1 is returned, and errno is set to ENOMEM.
+	
+	
+	C语言跟内存申请相关的函数主要有 alloca,calloc,malloc,free,realloc,sbrk等.
+
+　　其中alloca是向栈申请内存,因此无需释放. malloc分配的内存是位于堆中的,并且没有初始化内存的内容,因此基本上malloc之后,调用函数memset来初始化这部分的内存空间.
+
+　　calloc则将初始化这部分的内存,设置为0. 而realloc则对malloc申请的内存进行大小的调整.申请的内存最终需要通过函数free来释放. 而sbrk则是增加数据段的大小;
+
+　　malloc/calloc/free基本上都是C函数库实现的,跟OS无关.C函数库内部通过一定的结构来保存当前有多少可用内存.如果程序malloc的大小超出了库里所留存的空间,
+	那么将首先调用brk系统调用来增加可用空间,然后再分配空间.free时,释放的内存并不立即返回给os,而是保留在内部结构中. 可以打个比方: brk类似于批发,一次性的向OS申请大的内存,而malloc等函数则类似于零售,满足程序运行时的要求.这套机制类似于缓冲.
+	
+	使用这套机制的原因: 系统调用不能支持任意大小的内存分配(有的系统调用只支持固定大小以及其倍数的内存申请,这样的话,对于小内存的分配会造成浪费; 系统调用申请内存代价昂贵,涉及到用户态和核心态的转换. 		  函数malloc()和calloc()都可以用来分配动态内存空间，但两者稍有区别。
+	
+	58.OSI模型(open system interconnection)-- 七层模型
+	
+		7--应用层 ----- |
+		6--表示层		|  应用层
+		5--会话层------ |
+		
+		4--传输层----------|
+		3--网络层----------|  TCP\UDP IPv4 IPv6
+		
+		2--数据链路层
+		
+		1--物理层
+	
+	58.多态案例分析
+		#include <stdlib.h>
+		#include <stdio.h>
+		#include <sstream>
+
+		class Base
+		{
+		public:
+			Base()
+			{	
+			}
+			virtual ~Base()
+			{	
+			}
+			virtual int Ifunc(int a);
+			typedef int (Base::*InterfaceFunc)(int a);
+			void Func(Base *base, InterfaceFunc f, int a)
+			{
+				(base->*f)(a);
+			}
+		private:
+		};
+		int Base::Ifunc(int a)
+		{
+			printf("Base func %d\n", a);
+			return 0;
+		}
+		class Sub : public Base
+		{
+		public:
+			Sub()
+			{		
+			}
+			virtual ~Sub()
+			{	
+			}
+			virtual int Ifunc(int a);
+		private:
+			Base base;
+		};
+		int Sub::Ifunc(int a)
+		{
+			printf("Sub func %d\n", a);
+			return 0;
+		}
+		int main(int argc, char **argv)
+		{
+			int a = 88;
+			Base *base  = new Base();
+			Sub *sub = new Sub();
+			base->Func(sub, &Base::Ifunc, a); //调用的是子类
+			system("pause");
+		}
+	
+	59.Lambda（匿名函数）------------------------------------------------------------------------最终生成的汇编和仿函数（函数对象的是一样的）
+	 C++11 的 lambda 表达式规范如下：
+		[ capture ] ( params ) mutable exception attribute -> ret { body }	(1)	 
+		[ capture ] ( params ) -> ret { body }	(2)	 
+		[ capture ] ( params ) { body }	(3)	 
+		[ capture ] { body }	(4)	 
+	
+		ISO C++ 11 标准的一大亮点是引入Lambda表达式。基本语法如下：
+		[capture list] (parameter list) ->return type { function body }[1] 
+		其中除了“[ ]”（其中捕获列表可以为空）和“复合语句”（相当于具名函数定义的函数体），其它都是可选的。它的类型是唯一的具有成员operator()的非联合的类类型，称为闭包类型(closure type)。
+		C++中，一个lambda表达式表示一个可调用的代码单元。我们可以将其理解为一个未命名的内联函数。它与普通函数不同的是，lambda必须使用尾置返回来指定返回类型。
+		例如调用<algorithm>中的std::sort，ISO C++ 98 的写法是要先写一个compare函数：
+		bool compare(int&a,int&b)
+		{
+			return a>b;//降序排序
+		}
+		然后，再这样调用：
+		sort(a,a+n,compare);
+		然而，用ISO C++ 11 标准新增的Lambda表达式，可以这么写：
+		sort(a,a+n,[](int a,int b){return a>b;});//降序排序
+		这样一来，代码明显简洁多了。
+		由于Lambda的类型是唯一的，不能通过类型名来显式声明对应的对象，但可以利用auto关键字和类型推导：
+		auto f=[](int a,int b){ return a > b; };
+		和其它语言的一个较明显的区别是Lambda和C++的类型系统结合使用，如：
+		auto f=[x](int a,int b){return a>x;});		//x被捕获复制（值传递）
+		int x=0,y=1;
+		auto g=[&](int x){return ++y;});			//y被捕获引用，调用g后会修改y，需要注意y的生存期（引用传递）
+		*********************************************************************************************************************************
+		bool(*fp)(int,int)=[](int a,int b){return a>b;});	//不捕获时才可转换为函数指针
+		
+		Lambda表达式可以嵌套使用。
+		即将出版的ISO C++14支持基于类型推断的泛型lambda表达式。		上面的排序代码可以这样写：
+		sort(a,a+n,[](const auto&a,const auto&b){return a>b;});		//降序排序：不依赖a和b的具体类型
+		因为参数类型和函数模板参数一样可以被推导而无需和具体参数类型耦合，有利于重构代码；和使用auto声明变量的作用类似，它也允许避免书写过于复杂的参数类型。
+		特别地，不需要显式指出参数类型使使用高阶函数变得更加容易。
+		
+		1. lambda-introducer： 定义引用自由变量的方式。
+
+		[a,&b] a变量以值的方式呗捕获，b以引用的方式被捕获。
+		[this] 以值的方式捕获 this 指针。
+		[&] 以引用的方式捕获所有的外部自动变量。
+		[=] 以值的方式捕获所有的外部自动变量。
+		[] 不捕获外部的任何变量。
+	
+	
+	60.automake和autoconf : 
+		　1. autoscan
+		　　autoscan是 用来扫描源代码目录生成configure.scan文件的 .autoscan
+		可以用目录名做为参数,但如果你不使用参数的 话,那么autoscan将认为使用的是当前目录.
+		autoscan将扫描你所指定目录中的 源文件,并创建configure.scan文件.
+		　　2. configure.scan
+		　　configure.scan包含了系统配置的 基本选项,里面都是 一些宏定义.我们需要将它改名为
+		configure.in
+		　　3. aclocal
+		　　aclocal是 一个perl 脚本程序.aclocal根据configure.in文件的 内容
+		,自动生成aclocal.m4文件.aclocal的 定义是 ："aclocal - create
+		aclocal.m4 by scanning configure.ac".
+		　　4. autoconf
+		　　autoconf是 用来产生configure文件的 .configure是 一个脚本,它能设置
+		源程序来适应各种不同的操作系统平台,并且根据不同的 系统来产生合适的 Makefile,从而可以使
+		你的源代码能在不同的操作系统平台上被编译出来.
+		　　configure.in文件的 内容是 一些宏,这些宏经过autoconf 处理后会变成检查系统
+		特性.环境变量.软件必须的 参数的 shell脚本.configure.in文件中的 宏的 顺序并没
+		有规定,但是 你必须在 所有宏的 最前面和最后面分别加上AC_INIT宏和AC_OUTPUT宏.
+		　　在 configure.ini中：
+		　　#号表示注释,这个宏后面的 内容将被忽略.
+		　　AC_INIT(FILE)
+		　　这个宏用来检查源代码所在 的 路径.
+		AM_INIT_AUTOMAKE(PACKAGE, VERSION)
+		　　 这个宏是 必须的 ,它描述了我们将要生成的 软件包的 名字及其版本号：PACKAGE是软件包
+		的名字,VERSION是 版本号.当你使用make dist命令时,它会给你生成一个类似
+		helloworld-1.0.tar.gz的 软件发行包,其中就有对应的 软件包的 名字和版本号.
+		AC_PROG_CC
+		　　这个宏将检查系统所用的 C编译器.
+		AC_OUTPUT(FILE)
+		　　这个宏是 我们要输出的 Makefile的 名字.
+		　　我们在 使用automake时,实际上还需要用到其他的 一些宏,但我们可以用aclocal 来帮
+		我们自动产生.执行aclocal后我们会得到aclocal.m4文件.
+		　　产生了configure.in和aclocal.m4 两个宏文件后,我们就可以使用autocon
+		f来产生configure文件了.
+		　　5. Makefile.am
+		　　Makefile.am是 用来生成Makefile.in的 ,需要你手工书写.Makefile.
+		am中定义了一些内容：
+		AUTOMAKE_OPTIONS
+		　　这个是 automake的 选项.在 执行automake时,它会检查目录下是 否存在 标准
+		GNU软件包中应具备的各种文件,例如AUTHORS.ChangeLog.NEWS等文件.
+		我们将其设置成foreign时,automake会改用一般软件包的 标准来检查.
+		bin_PROGRAMS
+		　　这个是 指定我们所要产生的 可执行文件的 文件名.如果你要产生多个可执行文件,
+		那么在各个名字间用空格隔开.
+		helloworld_SOURCES
+		　　这个是 指定产生"helloworld"时所需要的 源代码.如果它用到了多个源文件,
+		那么请使用空格符号将它们隔开.比如需要helloworld.h,helloworld.c那么请写成:
+		helloworld_SOURCES= helloworld.h helloworld.c.
+		　　如果你在 bin_PROGRAMS定义了多个可执行文件,则对应每个可执行文件都要定义相对的
+		filename_SOURCES.
+		　　6. automake
+		　　我们使用automake --add-missing来产生Makefile.in.
+		　　选项--add-missing的 定义是 "add missing standard files
+		to package",它会让automake加入一个标准的 软件包所必须的 一些文件.
+		　　我们用automake产生出来的 Makefile.in文件是 符合GNU Makefile惯例
+		的 ,接下来我们只要执行configure这个shell 脚本就可以产生合适的 Makefile 文
+		件了.
+		　　7. Makefile
+		　　在 符合GNU Makefiel惯例的 Makefile中,包含了一些基本的 预先定义的 操作：
+
+		make
+		　　根据Makefile编译源代码,连接,生成目标文件,可执行文件.
+		make clean
+		　　清除上次的 make命令所产生的 object文件（后缀为".o"的 文件）及可执行文件.
+		make install
+		　　将编译成功的 可执行文件安装到系统目录中,一般为/usr/local/bin目录.
+		make dist
+		　　产生发布软件包文件（即distribution package）.这个命令将会将可执行文件及相关
+		文件打包成一个tar.gz压缩的 文件用来作为发布软件的 软件包.
+		　　它会在 当前目录下生成一个名字类似"PACKAGE-VERSION.tar.gz"的 文件.PA
+		CKAGE和VERSION,是 我们在 configure.in中定义的 AM_INIT_AUTOM
+		AKE(PACKAGE, VERSION).
+		make distcheck
+		　　生成发布软件包并对其进行测试检查,以确定发布包的正确性.
+		
+	61.数据溢出！！！！
+			int max_i = 2147483647;
+			long long max_ll = 2147483647;
+
+			long long temp  = max_i * 2; -- 结果为负数（乘出来的值int为负再用long long 赋值）
+			long long temp1  = max_ll * 2; -- 结果为正数
+			
+			long long ll = temp + (long long)10000;	//将10000转为long long 临时保存的结果也是long long 类型了不会溢出
+			long long ll = temp + 10000;			//此时会出现溢出现象，右边保存结果的临时变量是int
+	
+	62.使用迭代器时要加倍小心啊
+	for (; it != .end(); ++it)
+	{
+		//在里面绝对不能对it进行++之类的操作，因为有可能++it之后已经到末尾了；然后到循环语句里面再++就会出错了；
+		虽然有判断it != .end(),但次判断是在执行for中的++it再进行的
+	}
+	
+	63.
+	设计模式：
+		命令模式:
+		观察者模式：
+		享元模式:
+		原型模式：
+		单例模式：
+		状态模式：
+	序列模式：
+		双缓冲模式：多线程或者图形输出，又或者连锁反应的（A—>C->B->A,一个被打即做出反应的小游戏)，非双缓冲可能导致反应不在同一帧内表现；
+		
+		非缓冲模式：当线程更新到c,刚好c打b,b状态被更新为被打A状态也更新为被打，但不能表现出来（更新状态和图形输出不用线程），但由于此时，线程更新完c，ab只能在下一帧更新！！
+		
+		缓冲模式：情况同上， 但状态都放到缓冲状态区，下一帧更新之后全部会做出反应！（好像这样画面表现顺序不对ABC,只是保证在同一帧内更新了）
+		
+		游戏循环：
+		更新方法：
+	行为模式：
+		字节码：
+		子类沙箱：
+		类型对象：
+	解耦模式：
+		组件模式：
+		事件模式：
+		服务定位器模式：
+	优化模式：
+		数据局部性：
+		脏标记模式：
+		对象池模式：
+		空间分区：
+			
+	工厂模式：
+		(1)简单工厂模式（工厂，抽象类，具体类， 所有具体类由工厂生产提供）：
+				创建型模式对类的实例化过程进行了抽象，能够将对象的创建与对象的使用过程分离。
+				简单工厂模式又称为静态工厂方法模式，它属于类创建型模式。在简单工厂模式中，可以根据参数的不同返回不同类的实例。简单工厂模式专门定义一个类来负责创建其他类的实例，被创建的实例通常都具有共同的父类。
+				简单工厂模式包含三个角色：工厂角色负责实现创建所有实例的内部逻辑；抽象产品角色是所创建的所有对象的父类，负责描述所有实例所共有的公共接口；具体产品角色是创建目标，所有创建的对象都充当这个角色的某个具体类的实例。
+				简单工厂模式的要点在于：当你需要什么，只需要传入一个正确的参数，就可以获取你所需要的对象，而无须知道其创建细节
+				简单工厂模式最大的优点在于实现对象的创建和对象的使用分离，将对象的创建交给专门的工厂类负责，但是其最大的缺点在于工厂类不够灵活，增加新的具体产品需要修改工厂类的判断逻辑代码，
+				而且产品较多时，工厂方法代码将会非常复杂。
+				简单工厂模式适用情况包括：工厂类负责创建的对象比较少；客户端只知道传入工厂类的参数，对于如何创建对象不关心
+		(2)工厂方法（抽象工厂，具体工厂， 抽象类，具体类， 所有具体类由具体工厂生产提供,需要什么类就用什么类的工厂create）：
+		(3)抽象工厂--方便具体类的再拓展（抽象工厂，工厂AB, 抽象类AB， 具体类A1B1）-》创建和工厂方法差不多
+		(4)
+		
+	64.委托构造：
+		class class_c 
+		{  
+			public:  
+				int max;  
+				int min;  
+				int middle;  
+			  
+				class_c(int my_max) 
+				{   
+					max = my_max > 0 ? my_max : 10;   
+				}  
+				class_c(int my_max, int my_min) : class_c(my_max)//委托构造
+				{   
+					min = my_min > 0 && my_min < max ? my_min : 1;  
+				}  
+				class_c(int my_max, int my_min, int my_middle) : class_c (my_max, my_min)
+				{  
+					middle = my_middle < max && my_middle > min ? my_middle : 5;  
+				}  
+		}; 
+		
+	65.
+	#pragma pack(push, 4)
+	封装类是在内存中将其一个成员直接放在另一个后面，这可能表示对齐部分或全部成员的边界可以小于默认对齐目标体系结构。 pack 提供了数据声明级别的控制。 
+	这与编译器选项 /Zp 不同，该选项只提供模块级别控制。 在杂注出现之后，pack 在第一个 struct、union 或 class 声明处生效。 pack 对定义没有影响。 
+	在没有参数的情况下调用 pack 会将 n 设置为编译器选项 /Zp 中设置的值。 如果未设置编译器选项，则默认值为 8
+	show （可选）
+	显示封装对齐的当前字节值。 该值由警告消息显示。
+	push （可选）
+	将当前封装对齐值推送到内部编译器堆栈上，并将当前封装对齐值设置为 n。 如果未指定 n，则将推送当前封装对齐值。
+	pop （可选）
+	从内部编译器堆栈的顶部移除记录。 如果没有用 n 指定 pop，则与堆栈顶部的生成的记录关联的封装值是新的封装对齐值。 如果指定了 n（例如 #pragma pack(pop, 16)），n 将成为新的封装对齐值。 如果使用 identifier（例如 #pragma pack(pop, r1)）进行弹出，则堆栈上的所有记录都将弹出，直到找到包含 identifier 的记录。 该记录将会弹出，与堆栈顶部的生成的记录关联的封装值是新的封装对齐值。 如果使用在堆栈上的任何记录中均未发现的 identifier 进行弹出，则会忽略 pop。
+	identifier （可选）
+	当与 push 一起使用时，为内部编译器堆栈上的记录指定名称。 当与 pop 一起使用时，从内部堆栈中弹出记录，直到移除 identifier；如果未在内部堆栈上找到 identifier，则不会弹出任何内容。
+	n（可选）
+	指定要用于封装的值（以字节为单位）。 如果没有为模块设置编译器选项 /Zp，n 的默认值为 8。 有效值为 1、2、4、8 和 16。 成员将在作为 n 的倍数或成员的大小的倍数的边界（以较小者为准）上对齐。
+	#pragma pack(pop, identifier``, n``) 是不确定的。
+	
+	66.
+	位运算：（一个数a交换 第n位 与 第m位）--位运算只能用于整型
+	i = (a >> n) & 1;
+	j = (a >> m) & 1;
+	
+	i &= 0xffffffff;
+	j &= 0xffffffff;
+	
+	//亦或整个数都变了
+	a ^=  (i << m);
+	a ^= (j << n); 
+	
+	67.new\delete:(误区别以为其他语言分配内存慢，其他语言有一个内存池也能实现高效的内存分配只需要移动指针即可--但在垃圾回收时会比较耗时)
+	内存池的实现最高效的实现就是堆栈内存池；
+	
+	new: 1.分配内存（malloc-sbrk），2.调用A()构造对象，3. 返回分配指针
+	
+		1. operator new重载运用于调试
+		前面提到如何operator new的重载是可以有自定义参数的，那么我们如何利用自定义参数获取更多的信息呢，这里一个很有用的做法就是给operator new添加两个参数:char* file, int line,
+		这两个参数记录new关键字的位置，然后再在new时将文件名和行号传入，这样我们就能在分配内存失败时给出提示：输出文件名和行号。
+		那么如何获取当前语句所在文件名和行号呢，windows提供两个宏：__FILE__和__LINE__
+		
+		2. 内存池优化
+		operator new的另一个大用处就是内存池优化，内存池的一个常见策略就是分配一次性分配一块大的内存作为内存池(buffer或pool)，然后重复利用该内存块，每次分配都从内存池中取出，
+		释放则将内存块放回内存池。在我们客户端调用的是new关键字，我们可以改写operator new函数，让它从内存池中取出(当内存池不够时，再从系统堆中一次性分配一块大的)，
+		至于构造和析构则在取出的内存上进行，然后再重载operator delete，它将内存块放回内存池
+		
+		***********************************************************************************************
+		new[]和new类似，仍然会优先调用类中重载的operator new[]。另外还要注意的是，在operator new[](size_t size)中传入的并不是sizeof(A)*3。而要在对象数组的大小上加上一个额外数据，
+		用于编译器区分对象数组指针和对象指针以及对象数组大小(进行operator++等操作以及delete[]时多少个对象)。在VS2008(32 bit)下这个额外数据占4个字节，一个int大小
+	
+	delete:包含了~A()和operator delete(a)两个步骤
+	
+		delete的使用基本和new一致，包括operator delete的重载方式这些都相似，只不过它的参数是void*，返回值为void。但是有一点需要注意，operator delete的自定义参数重载并不能手动调用。
+		
+	68.计算机的硬件结构中只有加法器，所以大部分的运算都必 须最终转换为加法
+	
+	69.在管理一个很大的数据集时，有些脏数据才需要更新，其他的可以不更新：
+		1.如果用脏标记的话，我们一样要遍历一个和所有数据集一样大的脏标记集；而且也要存储一个一样大的标记集
+		
+		我们可以使用这些指针构建链表，将池中每个未使用粒子都连在一起。 我们有可用粒子的列表，而且无需使用额外的内存。 我们使用了死亡粒子本身的内存来存储列表。
+		这种聪明的技术被称为freelist。 为了让其工作，我们需要保证指针正确的初始化，在粒子创建和销毁时好好被管理了。 并且，当然，我们要追踪列表的头指针
+		
+	70.'0' ,'\0',NULL;
+	'0' ascii 为48
+	'\0' ascii 为0
+	
+	
+	71.
+		int strcmp(const char *str1,const char *str2)
+		{
+			/*不可用while(*str1++==*str2++)来比较，当不相等时仍会执行一次++，
+			return返回的比较值实际上是下一个字符。应将++放到循环体中进行。*/
+			while(*str1 == *str2)
+			{
+				if(*str1 == '\0')
+					return0;
+				 
+				str1++;
+				str2++;
+			}
+			return *str1 - *str2;
+		}
+		
+	72.相对文件打开路径路径问题：
+		它们的相对位置不一样。所谓相对位置都是相对自己的，
+		调试的时候，相对的是工程文件目录（vcxproj文件）。
+		直接运行是相对可执行文件路径。
+	
+	73.关于在VC中调用其它EXE
+      三个SDK函数: WinExec，ShellExecute ，CreateProcess可以实现调用其他程序的要求，其中以WinExec最为简单，     ShellExecute比WinExec灵活一些，CreateProcess最为复杂。 
+	WinExec 两个参数，前一个指定路径，后一个指定显示方式。 
+	ShellExecute 可以指定工作目录,并且还可以寻找文件的关联直接打开不用加载与文件关联的应用程序，ShellExecute还可以打开网页，启动相应的邮件关联发送邮件等等。 	CreateProcess一共有十个参数，不过大部分都可以用NULL代替，它可以指定进程的安全属性，继承信息，类的优先级等等。如果我们要得到足够多的关于新的进程的信息，控制新的进程的细节属性，若要达到这些目的，我们就需要使用CreateProcess函数了。 
+     三个SDK函数（ WinExec、ShellExec、CrateProcess ）的语法： 
+
+    WinExec 这个函数最简单，只有两个参数，原型如下： 
+		UINT WinExec( LPCSTR lpCmdLine, // 命令路径 
+					UINT uCmdShow) // 显示方式 ; 
+				使用方法如下： 
+	WinExec("Notepad.exe", SW_SHOW); // 打开记事本 
+	WinExec("D:\\Program Files\\Test\\Test.exe",SW_SHOWMAXIMIZED); // 以最大化的方式打开Test.exe 
+    需要注意的是若用 SW_SHOWMAXMIZED 方式去加载一个无最大化按钮的程序，譬如Neterm，Calc 等等，就不会出现正常的窗体，但是已经被加到任务列表里了。 
+
+     ShellExecute 原型如下： 
+		HINSTANCE ShellExecute( HWND hwnd, //父窗口句柄 
+		LPCTSTR lpOperation, //操作, 打开方式 
+		"edit","explore","open","find","print","NULL" LPCTSTR lpFile, //文件名,前面可加路径 
+		LPCTSTR lpParameters, //参数 
+		LPCTSTR lpDirectory, //默认文件夹 
+		INT nShowCmd //显示方式 ); 使用方法如下： 
+		
+		ShellExecute(NULL,"open","C:\\Test.txt",NULL,NULL,SW_SHOWNORMAL); // 打开C:\Test.txt 文件 
+		ShellExecute(NULL, "open", "iexplore.exe","http://www.welcomebbs.com",/ NULL, NULL, SW_SHOWNORMAL); // 打开网页www.welcomebbs.com 
+		ShellExecute(NULL,"explore", "D:\\C++",NULL,NULL,SW_SHOWNORMAL); // 打开目录D:\C++ 
+		ShellExecute(NULL,"print","C:\\Test.txt",NULL,NULL, SW_HIDE); // 打印文件C:\Test.txt 
+		ShellExecute不支持定向输出。 
+
+    CreateProcess (welcomebbs)原型如下： 
+		BOOL CreateProcess( LPCTSTR lpApplicationName, //执行程序名 
+		LPTSTR lpCommandLine, // 参数行 
+		//下面两个参数描述了所创建的进程和线程的安全属性，如果为NULL则使用默认的安全属性 
+		LPSECURITY_ATTRIBUTES lpProcessAttributes, // 
+		process security attributes LPSECURITY_ATTRIBUTES lpThreadAttributes, // 
+		thread security attributes BOOL bInheritHandles, // 继承标志 
+		DWORD dwCreationFlags, // 创建标志 
+		LPVOID lpEnvironment, // 环境变量 
+		LPCTSTR lpCurrentDirectory, // 运行该进程的初始目录 
+		LPSTARTUPINFO lpStartupInfo, // 用于在创建子进程时设置各种属性 
+		LPPROCESS_INFORMATION lpProcessInformation //用于在进程创建后接受相关信息 
+
+	使用方法如下： 
+	PROCESS_INFORMATION pi; 
+	STARTUPINFO si; 
+	memset(&si,0,sizeof(si));
+	si.cb=sizeof(si);
+	si.wShowWindow=SW_SHOW; 
+	si.dwFlags=STARTF_USESHOWWINDOW;
+	bool fRet=CreateProcess("D:\\putty.exe",NULL,NULL,FALSE,NULL,NULL,NULL,NULL,&si,π);
+
+	关于三个SDK函数: WinExec， ShellExecute，CreateProcess (welcomebbs)的注意 
+	1、定义头文件 在头文件stdafx.h中必须定义以下两个头文件： 
+	如果定义了头文件 #include <windows.h>的话就不必定义 #include <shlobj.h>了，"windows.h" 不光是包含了"shellapi.h"，它还定义了许多数据类型，如果没有这些数据类型，shellapi.h本身会出错。 
+
+	2、定义路径 C++中所表示的路径要用 " \\ "而不是平常所用的" \ "，所以以上三个函数表示路径都为： 
+	WinExec("D:\\Program Files\\Test\\Test.exe",SW_SHOWMAXIMIZED); 
+	ShellExecute(NULL,"open","C:\\Test.txt",NULL,NULL,SW_SHOWNORMAL);
+	bool fRet=CreateProcess("D:\\putty.exe",NULL,NULL,FALSE,NULL,NULL,NULL,NULL,&si,π);
+	
+	
+	74.
+	
+----------------------------------------------------------------------------------- 低级IO ----------------------------------------------------------------------
+
+	【功能】																	【使用】
+	_close																	关闭文件
+	_commit																	刷新文件到磁盘
+	_creat、_wcreat															创建文件
+	_dup																	返回给定文件中下一个可用的文件说明符
+	_dup2																	创建特定文件的第二描述符
+	_eof																	测试文件结尾
+	_lseek、_lseeki64														重新定位文件指针到特定位置
+	_open、_wopen															打开文件
+	_read																	从文件中读取数据
+	_sopen, _wsopen, _sopen_s、_wsopen_s									为文件共享打开文件
+	_tell、_telli64															捕获当前文件指针的位置
+	_umask, _umask_s														设置文件权限掩码
+	_write																	写数据到文件
+
+
+
+
+	  vs要用（POSIX）open() ,write 需要头文件fcntl.h(文件控制标识符定义)以及io.h(包含open write的声明定义)
+	  高级vs版本更安全的方法：
+	  errno_t _sopen_s(int* pfh, const char *filename, int oflag, int shflag, int pmode); 
+	  
+	[out] pfh
+	文件句柄或 -1（如果出现错误）。
+	[in] filename
+	文件名。
+	[in] oflag
+	允许的操作类型。
+	[in] shflag
+	允许的共享类型。
+	[in] pmode
+	权限设置。
+------------------	
+	oflag 是通过合并在 <fcntl.h> 中定义的一个或多个清单常量而形成的。 当两个或多个常量构成参数oflag，使用按位或运算符合并它们: ( | )。
+	_O_APPEND
+	在执行每个写入操作之前，将文件指针重新定位到文件末尾。
+	_O_BINARY
+	在二进制（未转换）模式下打开文件。 (请参阅fopen有关二进制模式下的说明。)
+	_O_CREAT
+	创建文件并打开它以供写入。 如果由 filename 指定的文件存在，则不会产生任何影响。
+	_O_CREAT | _O_SHORT_LIVED
+	创建一个文件作为临时文件，如果可能，请不要将它刷新到磁盘中。
+	_O_CREAT | _O_TEMPORARY
+	创建一个文件作为临时文件；在关闭最后一个文件描述符时，删除该文件。
+	_O_CREAT | _O_EXCL
+	如果由 filename 指定的文件存在，则返回一个错误值。 仅在与 _O_CREAT 一起使用时应用。
+	_O_NOINHERIT
+	阻止创建共享文件描述符。
+	_O_RANDOM
+	从磁盘中指定主要随机访问。
+	_O_RDONLY
+	打开文件以供只读。 无法使用 _O_RDWR 或 _O_WRONLY 进行指定。
+	_O_RDWR
+	打开文件以供读取和写入。 无法使用 _O_RDONLY 或 _O_WRONLY 进行指定。
+	_O_SEQUENTIAL
+	从磁盘中指定主要顺序访问。
+	_O_TEXT
+	在文本（转换）模式下打开文件。 (有关详细信息，请参阅文本和二进制模式文件 I/O和fopen。)
+	_O_TRUNC
+	打开文件并将其长度截断为零；该文件必须具有写入权限。 无法使用 _O_RDONLY 进行指定。 结合使用 _O_TRUNC 和 _O_CREAT 来打开现有文件或创建文件(`_O_TRUNC` 标志会损坏指定文件的内容)
+	_O_WRONLY
+	打开文件以供只写。 无法使用 _O_RDONLY 或 _O_RDWR 进行指定。
+	_O_U16TEXT
+	在 Unicode UTF-16 模式下打开文件。
+	_O_U8TEXT
+	在 Unicode UTF-8 模式下打开文件。
+	_O_WTEXT
+	在 Unicode 模式下打开文件。
+	若要指定文件访问模式，你必须指定 _O_RDONLY、_O_RDWR 或 _O_WRONLY。 对于访问模式，不存在默认值。
+	使用 _O_WTEXT、_O_U8TEXT 或 _O_U16TEXT 在 Unicode 模式下打开文件时，输入函数会将从该文件中读取的数据转换为存储为 wchar_t 类型的 UTF-16 数据。 
+	写入到在 Unicode 模式下打开的文件的函数需要包含存储为 wchar_t 类型的 UTF-16 数据的缓冲区。 如果将文件编码为 UTF-8，则在写入它时，UTF-16 数据会转换为 UTF-8；在读取它时，
+	该文件的 UTF-8 编码的内容会转换为 UTF-16。 尝试在 Unicode 模式下读取或写入奇数个字节会导致参数验证错误。 若要读取或写入在你的程序中存储为 UTF-8 的数据，请使用文本或二进制文件模式，而不是 Unicode 模式。 
+	你应负责所有必需的编码转换。如果使用 _sopen_s（追加模式）和 _O_WRONLY | _O_APPEND、_O_WTEXT 或 _O_U16TEXT 调用 _O_U8TEXT，则它首先会尝试打开该文件以供读取和写入、读取 BOM，然后重新打开它以供只写。
+	如果无法打开该文件以供读取和写入，则它将打开该文件以供只写，并使用 Unicode 模式设置的默认值。
+---------------
+	`shflag` 参数是常量表达式，它包含在 <share.h> 中定义的以下清单常量之一
+	_SH_DENYRW
+	拒绝对文件的读取和写入访问。
+	_SH_DENYWR
+	拒绝对文件的写入访问。
+	_SH_DENYRD
+	拒绝对文件的读取访问。
+	_SH_DENYNO
+	允许读取和写入访问
+	
+	不同于 pmode，始终需要 _sopen 参数。 指定 _O_CREAT 时，如果该文件不存在，则 pmode 将指定在首次关闭新文件时设置的该文件的权限设置。 否则，将忽略 pmode。 pmode 是一个整数表达式，它包含在 <sys\stat.h> 中定义的以下 _S_IWRITE 和 _S_IREAD 常量之一或两个。 当给定这两个常量时，将使用按位“或”运算符合并它们。 pmode 的含义如下:
+	
+	#define _S_IFMT   0xF000 // File type mask
+	#define _S_IFDIR  0x4000 // Directory
+	#define _S_IFCHR  0x2000 // Character special
+	#define _S_IFIFO  0x1000 // Pipe
+	#define _S_IFREG  0x8000 // Regular
+	#define _S_IREAD  0x0100 // Read permission, owner
+	#define _S_IWRITE 0x0080 // Write permission, owner
+	#define _S_IEXEC  0x0040 // Execute/search permission, owner
+	
+	_S_IWRITE
+	允许写入。
+	_S_IREAD
+	允许读取。
+	_S_IREAD | _S_IWRITE
+	允许读取和写入。
+	如果未授予写入权限，则该文件为只读。 在 Windows 操作系统中，所有文件均可读；不可能提供只写权限。 因此，模式 _S_IWRITE 和 _S_IREAD | _S_IWRITE 是等效的。
+	在设置这些权限之前，_sopen_s 会将当前文件权限掩码应用到 pmod
+	
+	 long _lseek(int fd, long offset, int origin);
+		fd
+		引用打开的文件的文件说明符。
+		偏移量
+		中的字节数原点。
+		origin
+---------------
+		初始位置。
+		SEEK_SET
+		该文件的开头。
+		SEEK_CUR
+		文件指针的当前位置。
+		SEEK_END
+		文件尾
+	
+	
+	
+	除了以上值之外，可以在 mode 中包含以下字符以指定换行符的转换模式：
+	t
+	在文本（转换）模式下打开。 在此模式中，CTRL+Z 将在输入时解释为文件尾字符。 在打开使用 "a+" 进行读取/写入的文件中，fopen_s 将检查文件末尾的 Ctrl+Z 并在可能的情况下将其删除。 
+	这是因为使用 fseek 和 ftell 在以 CTRL+Z 结尾的文件中移动时，可能会导致 fseek 在文件末尾附近运行不当。
+	此外，在文本模式下，输入时，回车-换行组合将转换为单一的换行，输出时，换行字符将转换为回车-换行组合。 当 Unicode 流 I/O 函数在文本模式（默认设置）下运行时，源或目标流将假定为一系列多字节字符。 
+	因此，Unicode 流输入函数将多字节字符转换为宽字符（就像调用 mbtowc 函数一样）。 出于同一原因，Unicode 流输出函数将宽字符转换为多字节字符（就像调用 wctomb 函数一样）。
+	b
+	在二进制（未转换）模式下打开；不进行涉及回车和换行字符的转换。
+	如果 t 或 b 在 mode中未给出，则默认转换模式由全局变量 _fmode定义。 如果 t 或 b 是该参数的前缀，则函数将失败并返回 NULL。
+	有关使用文本和二进制模式下在 Unicode 和多字节流输入/输出的详细信息，请参阅文本和二进制模式文件 I/O和文本和二进制模式下的 Unicode 流 I/O。
+	c
+	启用关联 filename 的提交标志，以便在调用 fflush 或 _flushall 时将文件缓冲区的内容直接写入磁盘。
+	n
+	将关联 filename 的提交标志重置为“no-commit”。 这是默认设置。 如果将程序显式链接到 COMMODE.OBJ，它还将重写全局提交标志。 除非将程序显式链接到 COMMODE.OBJ，否则全局提交标志默认为“no-commit”（请参阅 Link Options）。
+	N
+	指定文件不由子进程继承。
+	S
+	指定缓存针对（但不限于）从磁盘的顺序访问进行优化。
+	R
+	指定缓存针对（但不限于）从磁盘的随机访问进行优化。
+	T
+	将文件指定为临时。 如果可能，它不会刷新到磁盘。
+	D
+	将文件指定为临时。 最后一个文件指针关闭时，它将被删除。
+	ccs=ENCODING
+	指定此文件使用的编码字符集 （UTF-8、UTF-16LE 和 UNICODE）。 如果需要 ANSI 编码，请保留此选项不指定。
+	
+----------------------------------------------------------------------------- 高级IO file stream --------------------------------------------------------------------------------------	
+	  errno_t fopen_s( FILE** pFile, const char *filename, const char *mode );
+	  pFile:文件指针将接收到打开的文件指针指向的指针; infilename:文件名; inmode:允许的访问类型("r", "w", "a", "r+", "w+", "a+")
+	  
+	  
+	  int fseek( FILE *stream, long offset, int origin );
+	  函数设置文件指针stream的位置。如果执行成功，stream将指向以fromwhere（偏移起始位置：文件头0(SEEK_SET)，当前位置1(SEEK_CUR)，文件尾2(SEEK_END)）为基准，偏移offset（指针偏移量）个字节的位置。如果执行失败(比如offset超过文件自身大小)，则不改变stream指向的位
+	  第一个参数stream为文件指针
+	  第二个参数offset为偏移量，整数表示正向偏移，负数表示负向偏移
+	  第三个参数origin设定从文件的哪里开始偏移,可能取值为：SEEK_CUR、 SEEK_END 或 SEEK_SET
+	  SEEK_SET： 文件开头
+	  SEEK_CUR： 当前位置
+	  SEEK_END： 文件结尾
+	  
+	对于在文本模式下打开的流fseek和_fseeki64用途相当有限，因为可能导致回车-换行翻译fseek和_fseeki64以产生意外的结果。 唯一fseek和_fseeki64保证上班的时候在文本模式下打开的流的操作︰
+	查找带有偏移量相对于任何原始值 0。查找从开始处的偏移量值的文件返回到调用ftell时使用fseek或_ftelli64时使用_fseeki64。
+	也在文本模式下，CTRL + Z 解释为对输入文件尾字符。 打开以进行读取/写入的文件中fopen和所有相关的例程检查文件末尾的 CTRL + Z，如果可能删除它。 这样做是因为使用的组合fseek和ftell或_fseeki64和_ftelli64，
+	将移动的文件中可能会导致 CTRL + Z 结尾fseek或_fseeki64文件末尾附近错误操作。
+ 
+	  long ftell(FILE *stream);
+	  用于得到文件位置指针当前位置相对于文件首的偏移字节数。
+	  
+	  size_t fread ( void *buffer, size_t size, size_t count, FILE *stream) ;
+	  fread是一个函数。从一个文件流中读数据，最多读取count个项，每个项size个字节，如果调用成功返回实际读取到的项个数（小于或等于count），如果不成功或读到文件末尾返回 0。
+	  buffer:用于接收数据的内存地址; size:要读的每个数据项的字节数，单位是字节; count:要读count个数据项，每个数据项size个字节; stream:输入流
+	  读取完成后文件指针位置偏移了.可用fseek和ftell得到当前位置
+	  
+	  size_t fwrite(const void* buffer, size_t size, size_t count, FILE* stream);
+	  注意：这个函数以二进制形式对文件进行操作，不局限于文本文件
+	  返回值：返回实际写入的数据块数目
+	（1）buffer：是一个指针，对fwrite来说，是要获取数据的地址；
+	（2）size：要写入内容的单字节数；
+	（3）count:要进行写入size字节的数据项的个数；
+	（4）stream:目标文件指针；
+	（5）返回实际写入的数据项个数count。
+	说明：写入到文件的哪里？ 这个与文件的打开模式有关，如果是w+，则是从file pointer指向的地址开始写，替换掉之后的内容，文件的长度可以不变，stream的位置移动count个数；如果是a+，
+	则从文件的末尾开始添加，文件长度加大。
+	
+	fseek对此函数有作用，但是fwrite[1]  函数写到用户空间缓冲区，并未同步到文件中，所以修改后要将内存与文件同步可以用fflush（FILE *fp）函数同步。
+
+	char * fgets ( char * str, int num, FILE * stream );
+		Get string from stream
+		Reads characters from stream and stores them as a C string into str until (num-1) characters have been read or either a newline or the end-of-file is reached, whichever happens first.
+		A newline character makes fgets stop reading, but it is considered a valid character by the function and included in the string copied to str.
+		A terminating null character is automatically appended after the characters copied to str.
+		
+	76.（当需要一个大的数组时不要再类内定义一个 char list[1024* 1024 * x]那么大的数组。
+	由于寄存器大小限制，应该用数组指针，然后new，这样寄存器操作指针就不会溢出寄存器大小。
+	
+	
+	栈(stack)--先进后出的队列不存在碎片问题（非静态、非全局）
+		栈大小与编译器有关。
+		默认情况下，visual studio 2010 的栈大小为1M。但在平时应用程序中，由于函数会使用栈结果，所以只能用略小于1M大小的栈。
+		按照默认设置，该堆栈的地址空间区域的大小是 1 MB。(vc 修改设置项目属性-》链接器-》系统-》堆栈保留（保留在虚拟页）)
+		
+	静态存储区(全局变量）
+		对于全局变量来说，与编译器有关（不保证正确）
+		默认情况下，VS2010可容纳的全局变量数组大小是2G
+		
+	对于Heap来说，与程序是32位还是64位，以及编译器都有关。
+		在VS2010的默认情况下，32位程序可以申请的堆大小最大是2G。实际上只能小于2G。
+		而64位程序，如果没有虚拟内存（硬盘）的支持，则可以使用128G的内存（比如说，你有8G内存，就可以使用8G内存）。而如果你把虚拟内存开启，则可以理论上得到16TB的内存使用大小[2].
+
+		下面的程序中，32位程序申请1.8G内存。64位程序下，开启300G虚拟内存，我们申请256G内存。
+		小细节：由于C++自己的考虑，new操作在64位下也只能最多获得4G内存，而用C函数malloc则可以得到理论上的内存大小[3].****************************************
+		
+	总结一下，在默认情况下，栈只能得到1M大小的内存，全局静态储存可以得到2G，而在32位和64位下的堆则可以得到2G和无限内存（一般不会用到16T）
+	
+	在Linux系统上，程序被载入内存时，内核为用户进程地址空间建立了代码段、数据段和堆栈段，在数据段与堆栈段之间的空闲区域用于动态内存分配。
+
+	内核数据结构mm_struct中的成员变量start_code和end_code是进程代码段的起始和终止地址，start_data和end_data是进程数据段的起始和终止地址，start_stack是进程堆栈段起始地址，
+	start_brk是进程动态内存分配起始地址（堆的起始地址），还有一个 brk（堆的当前最后地址），就是动态内存分配当前的终止地址
+	
+	每个进程的地址空间都是固定并且相同的
+	进程地址空间的地址都是虚拟地址，即理论上是可以从0x00000000~0xFFFFFFFF
+	
+	77.堆排序
+		堆排序方法对记录数较少的文件并不值得提倡，但对n较大的文件还是很有效的。因为其运行时间主要耗费在建初始堆和调整建新堆时进行的反复“筛选”上。
+　　堆排序在最坏的情况下，其时间复杂度也为O(nlogn)。相对于快速排序来说，这是堆排序的最大优点。此外，堆排序仅需一个记录大小的供交换用的辅助存储空间。
+**********************************************************************************************************************
+	78.当有符号存储溢出时，用无符号存储，再赋值给更大存储空间的其它类型存储就不会产生溢出问题。譬如：
+	char ch = '~'; //126
+	ch += 10;	// 溢出了
+	short sh = ch;		//同样是溢出之后的结果; 因为这样赋值符号位同样是1；
+	
+	//以下都是可取的方法
+	
+	memcpy(&sh, &ch, sizeof(ch));	//内存复制，这样符号位不会一样		--- 最简单
+	
+	short ush_max = 0xff;
+	int int_test = ush_max;(高位全部填补ush_max的最高位)
+	
+	或者
+	unsigned char ch_1 = ch; //这样必须是同等类型的无符号，不能是unsigned short之类的，因为符号位一样会移动到最高位（=号赋值导致的）
+	short sh = ch_1;	//ok，转义数据
+	
+	79.当类的对象需要拷贝时，拷贝构造函数将会被调用。以下情况都会调用拷贝构造函数：
+		（1）一个对象以值传递的方式传入函数体 
+		（2）一个对象以值传递的方式从函数返回 
+		（3）一个对象需要通过另外一个对象进行初始化。
+
+		如果在类中没有显式地声明一个拷贝构造函数，那么，编译器将会自动生成一个默认的拷贝构造函数，该构造函数完成对象之间的位拷贝。位拷贝又称浅拷贝　　
+		在某些状况下，类内成员变量需要动态开辟堆内存，如果实行位拷贝，也就是把对象里的值完全复制给另一个对象，如A=B。这时，如果B中有一个成员变量指针已经申请了内存，
+		那A中的那个成员变量也指向同一块内存。这就出现了问题：当B把内存释放了（如：析构），这时A内的指针就是野指针了，出现运行错误。
+
+	　　深拷贝和浅拷贝可以简单理解为：如果一个类拥有资源，当这个类的对象发生复制过程的时候，资源重新分配(重新分配指针资源不会导致其中一个析构而导致另一运行报错)，
+		这个过程就是深拷贝，反之，没有重新分配资源，就是浅拷贝。---------------在返回引用对象时应该注意，如果不用引用接收返回值就会出问题！！！！
+		潜拷贝不处理static成员：
+		class Rect
+		{
+		public:
+			Rect()
+			{
+			 count++;
+			}
+			~Rect()
+			{
+			 count--;
+			}
+			static int getCount()
+			{
+			 return count;
+			}
+		private:
+			int width;
+			int height;
+			static int count;
+		};
+
+		int Rect::count=0;
+		int main()
+		{
+			Rect rect1;
+			cout<<"The count of Rect:"<<Rect::getCount()<<endl;
+			Rect rect2(rect1);
+			cout<<"The count of Rect:"<<Rect::getCount()<<endl;
+			return 0;
+		}
+		
+		按照理解，此时应该有两个对象存在，但实际程序运行时，输出的都是1，反应出只有1个对象。此外，在销毁对象时，由于会调用销毁两个对象，
+		类的析构函数会调用两次，此时的计数器将变为负数。
+	
+	80.在一个类内可以访问其他类实例的私用成员的。例如：
+	class A
+	{
+	publuc:
+		void Set()
+		{
+			A *b =...getClassA();
+			b->a = 1000;	// 使用其他实例的私用成员
+		}
+	private:
+		int a;
+	};
+	
+	是由于在这些对象的内部具体实现的细节都是已知的。
+	
+	81.排序算法：
+	稳定排序:冒泡排序、归并排序、基数排序、
+	不稳定排序：选择排序、快速排序、shell排序（希尔排序）、堆排序
+	
+	冒泡:
+	void bubble_sort(int a[], int n)
+	{
+		int i, j, temp;
+		for (j = 0; j < n - 1; j++)
+			for (i = 0; i < n - 1 - j; i++)
+			{
+				if(a[i] > a[i + 1])
+				{
+					temp = a[i];
+					a[i] = a[i + 1];
+					a[i + 1] = temp;
+				}
+			}
+	}
+	
+	选择：
+	for(i=0;i<n-1;i++)
+	{
+		min=i;//查找最小值
+		for(j=i+1;j<n;j++)
+			if(a[min]>a[j])
+				min=j;//交换
+		if(min!=i)
+		{
+			t=a[min];
+			a[min]=a[i];
+			a[i]=t;
+		}
+	}
+	
+	
+	堆排序：堆排序的时间，主要由建立初始堆和反复重建堆这两部分的时间开销构成，它们均是通过调用Heapify实现的。堆排序的最坏时间复杂度为O(nlogn)。
+	堆序的平均性能较接近于最坏性能。由于建初始堆所需的比较次数较多，所以堆排序不适宜于记录数较少的文件，堆排序是就地排序，辅助空间为O(1）。
+	
+	82.逆序数		 						
+		在一个排列中，如果一对数的前后位置与大小顺序相反，即前面的数大于后面的数，那么它们就称为一个逆序。一个排列中逆序的总数就称为这个排列的逆序数。
+	逆序数为偶数的排列称为偶排列；逆序数为奇数的排列称为奇排列。[2]  如2431中，21，43，41，31是逆序，逆序数是4，为偶排列。
+	
+	83.A_Star
+	
+		OPEN = priority queue containing START --优先队列
+		CLOSED = empty set
+		while lowest rank in OPEN is not the GOAL:
+		  current = remove lowest rank item from OPEN
+		  add current to CLOSED
+		  for neighbors of current:
+
+			cost = g(current) + movementcost(current, neighbor)
+
+			if neighbor in OPEN and cost less than g(neighbor):
+			  remove neighbor from OPEN, because new path is better
+
+			if neighbor in CLOSED and cost less than g(neighbor):
+			  remove neighbor from CLOSED
+
+			if neighbor not in OPEN and neighbor not in CLOSED:
+			  set g(neighbor) to cost
+			  add neighbor to OPEN
+			  set priority queue rank to g(neighbor) + h(neighbor)
+			  set neighbor's parent to current
+
+		reconstruct reverse path from goal to start
+		by following parent pointers
+			  
+	84.Maze迷宫生产算法
+		1.Recursive backtracker ( 递归回溯，也是深度优先算法）
+			1.Make the initial cell the current cell and mark it as visited  
+			2.While there are unvisited cells  
+				1.If the current cell has any neighbours which have not been visited  
+					1.Choose randomly one of the unvisited neighbours  
+					2.Push the current cell to the stack  
+					3.Remove the wall between the current cell and the chosen cell  
+					4.Make the chosen cell the current cell and mark it as visited  
+				2.Else if stack is not empty  
+					1.Pop a cell from the stack  
+					2.Make it the current cell 
+
+		2.Randomized Prim's algorithm（随机Prim算法，让我想起了最小生成树的Prim算法）
+			1.Start with a grid full of walls.  
+			2.Pick a cell, mark it as part of the maze. Add the walls of the cell to the wall list.  
+			3.While there are walls in the list:  
+				1.Pick a random wall from the list. If only one of the two cells that the wall divides is visited, then:  
+					2.Make the wall a passage and mark the unvisited cell as part of the maze.  
+					3.Add the neighboring walls of the cell to the wall list.  
+				2.Remove the wall from the list.  
+
+		3.Recursive division （递归分割算法）
+		
+	85.std::map -- 不可用std::sort,map根据key值有默认排序了；
+	std::map<long long, RewarderUnit, std::greater<long long> > -- 根据key值从大到小排序
+	std::vector可用std::sort
+	
+	
+	86.常量字符串也是存储生命周期也是整个程序运行期间同static变量一样（因为在编译时所有常量字符串都需要规定放置位置）, 木有static的话属于不可修改的常量临时变量，不能用于数组
+	
+	87.数据类型转换
+		/*
+		@brief:
+		低转高（安全转换）类型转换符号位是与原来一致的.
+		高转低（不安全转换--由程序员保证） --计算机按位取舍
+
+		int int_max = INT_MAX;
+		int_max += 100;
+		long long ll_max = (long long)int_max; //负数--原来就是负数了，低转高安全转换，符号位一致
+
+		long long ll_max = INT_MAX + 100;
+		int int_max = (int)ll_max;  //负数(符号位不一致了)
+		*/
+		
+	88.当代码中有两个<>在一起是要添加一个空格以免编译时识别为>>位移符号！！
+	
+	89.嵌套类
+		对嵌套类的若干说明： 
+		（1）从作用域的角度来看，嵌套类与外围类是两个完全独立的类，只是主从关系，二者不能相互访问，也不存在友元关系。
+		（2）从访问权限的角度来看，嵌套类既可为私有，也可为公有。在上面的例子中，嵌套类B的访问权限是public，可以在外围类的成员函数之外使用该嵌套类，
+			使用时加上名字限定。如果将嵌套类B的访问权限设置为private，那么只能在外围类内使用。
+		（3）嵌套类中的成员函数可以在它的类体外定义。
+		（4）嵌套类可以访问外围类的静态成员变量，即使它的访问权限是私有的，访问方式通过”ClassName::staticVarName”来直接访问。（因为两者都是外围类的作用域下）
+		
+	 局部类(几乎不用):
+		关于局部类的几点说明： 
+			（1）局部类只能在定义它函数内部使用，在其他地方不能使用。
+			（2）局部类的所有成员函数都必须定义在类体内，因此在结构上不是特别灵活。
+			（3）在局部类的成员函数中，可以访问上级作用域的所有变量，如函数局部变量、全局变量等。
+			**********************************************************************************************
+			（4）局部类中不能定义静态数据成员，因为这种数据成员的初始化无法完成，静态成员数据的定义和初始化必须放在全局作用域。
+
+	在实践过程中，局部类很少使用
+	
+	90.很多程序员（包括我在内）已经对于在内存中移动数据过敏了。 将一堆数据移来移去感觉比发送指针要消耗大得多。 但是如果你加上了解析指针的代价，有时候这种估算是错误的。 
+	在有些情况下，如果能够保证缓存命中，在内存中移动数据消耗更小。
+	
+	91.
+	HWND(A handle to a window) 
+	HANDLE(A handle to an object) 
+	HINSTANCE(A handle to an instance. This is the base address of the module in memory.)
+	HMODULE(A handle to a module. This is the base address of the module in memory.)
+	
+	92.
+	无效区域 ：无效区域就是指需要重画的区域，无效的意思是：当前内容是旧的，过时的。 
+		BeginPaint() 和EndPaint() 可以删除消息队列中的WM_PAINT消息，并使无效区域有效。 
+	GetDC()和ReleaseDC()并不删除也不能使无效区域有效，因此当程序跳出 WM_PAINT 时 ，无效区域仍然存在。系统就回不断发送WM_PAINT消息，于是程序不断处理WM_PAINT消息。	BeginPaint、EndPaint会告诉GDI内部，这个窗口需要重画的地方已经重画了，这样WM_PAINT处理完返回给系统后，系统不会再重发WM_PAINT，而GetDC没有告诉系统这个窗口需要重画的地方已经画过，在你把程序返回给系统后，系统一直以为通知你的重画命令你还没有乖乖的执行或者执行出错，所以在消息空闲时，它还会不断地发WM_PAINT催促你画，导致程序卡死
+
+	所以在处理WM_PAINT时要重绘时必须使用BeginPaint否则画面闪烁(GetDC不会通知系统已经重绘)，
+	
+	93.	
+		计算机在引导时，系统要确定机器中有多少个CPU可供使用。通过调用GetSystemInfo函数，应用程序就能查询机器中的CPU数量。按照默认设置，任何线程都可以调度到
+		这些CPU中的任何一个上去运行。为了限制在可用CPU的子集上运行的单个进程中的线程数量，
+		
+		可以调用SetProcessAffinityMask：
+		第一个参数hProcess用于指明要影响的是哪个进程。第二个参数 dwProcessAffinityMask是个位屏蔽，用于指明线程可以在哪些 CPU上运行。例如，传递0x00000005表示该进程中的线程可以在
+		CPU 0和CPU2上运行，但是不能在CPU1和CPU3-CPU31上运行。
+		
+		注意，子进程可以继承进程的亲缘性。因此，如果一个进程的亲缘性屏蔽是 0x00000005，
+		那么它的子进程中的任何线程都拥有相同的位屏蔽，并共享相同的 CPU。此外，可以使用作业
+		内核对象将一组进程限制在要求的一组CPU上运行。
+		当然，还有一个函数也能够返回进程的亲缘性位屏蔽，它就是 GetProcessAffinityMaskk，如
+		下面的代码所示：
+		这里也可以传递想要亲缘性屏蔽的进程句柄，该函数填入 dwProcessAffinityMask指向的变量。该函数还能返回系统的亲缘性屏蔽（在 dwProcessAffinityMask指向的变量中）。系统的
+		亲缘性屏蔽用于指明系统的哪个CPU能够处理线程。进程的亲缘性屏蔽始终是一个系统的亲缘性屏蔽的正确子集
+		
+		通过调用SetThreadAffinityMask，就能为各个线程设置亲缘性屏蔽：
+		该函数中的hThread参数用于指明要限制哪个线程，dwThreadAffinityMask用于指明该线程能够在哪个CPU上运行。dwThreadAffinityMask必须是进程的亲缘性屏蔽的相应子集。返回值是线程的前一个亲缘性屏蔽
+		
+		若要为线程设置一个理想的CPU，可以调用SetThreadIdealProcessor(HANDLE hThread, DWORD dwIdealProcessor):
+		hThread用于指明要为哪个线程设置首选的 CPU。与我们已经介绍的其他函数不同，
+		dwIdealProcessor函数不是个位屏蔽函数，它是个从 0到31的整数，用于指明供线程使用的首选CPU。可以传递一个MAXINUM_PROCESSORS的值（在WinNT. h中定义为32），用于指明不
+		存在理想的 CPU。如果没有为该线程设置理想的 CPU，那么该函数返回前一个理想的CPU或MAXINUM_PROCESSORS。
+		
+	94.函数对象（仿函数）：
+		一个函数对象，即一个重载了括号操作符“operator()”的对象,参数可以自定义，除了这个重载和operator new operator delete其它重载不允许自定义参数类型和个数。
+		当用该对象调用此操作符时，其表现形式如同普通函数调用一般，因此取名叫函数对象.
+			1. 函数对象可以有自己的状态。我们可以在类中定义状态变量，这样一个函数对象在多次的调用中可以共享这个状态
+			2. 函数对象有自己特有的类型，而普通函数无类型可言。
+			
+		仿函数在STL中的定义
+		在STL中也为我们准备好了一些常用的仿函数。
+		这里是头文件 =>    #include<functional>
+		仿函数									效果
+		negate<type>()							-param
+		plus<type>()							param1+param2
+		minus<type>()							param1-param2
+		multiplies<type>()						param1*param2
+		divides<type>()							param1/param2
+		modulus<type>()							param1%param2
+		equal_to<type>()						param1==param2
+		not_equal_to<type>()					param!=param2
+		less<type>()							param1<param2
+		greater<type>()							param1>param2
+		less_equal<type>()						param1<=param2
+		greater_equal<type>()					param1>=param2
+		logical_not<type>()						!param
+		logical_and<type>()						param1&&param2
+		logical_or<type>()						param1||param2
+		
+		
+	1.仿函数:又叫std::function,是C++中的一个模板类
+	std::function本质上将函数封装成对象调用operator()带来调用函数
+	_Ret operator()(_Types... _Args) const
+	{	// call through stored object
+	if (_Empty())
+		_Xbad_function_call();
+	return (_Getimpl()->_Do_call(_STD forward<_Types>(_Args)...));
+	}
+	
+	2.C语言中的函数指针:
+	int  add(int a,int b)
+	{
+	　　return a+b;
+	}
+	typedef int (*func)(int,int);//给函数类型定义别名
+		
+	95.#define UNSTD_OFFSETOFF(TYPE, MEMBER)			((size_t)((char *)&(((TYPE *)0x10)->MEMBER) - (char*)0x10))
+	计算出偏移地址，不需要对象，只需要类型即可，0x10强制转换为类型指针
+	UNSTD_OFFSETOFF(TYPE, MEMBER) (size_t)((TYPE*)0x0->MEMBER)
+	
+	96.关于类成员函数内delete this问题：
+		class DeleteSelf
+		{
+		public:
+			DeleteSelf() : m_a(0) {}
+			~DeleteSelf() {}
+
+			void Set(int _a) { m_a = _a; }
+			void Free()
+			{
+				delete this;
+			}
+
+			void NotDumpFunc()
+			{
+				printf("NotDumpFunc\n");
+			}
+
+			void DumpFunc()
+			{
+				printf("DumpFunc member_data[%d]\n", m_a);
+			}
+
+		private:
+
+			int m_a;
+		};
+	
+		如果对象分配在堆栈里面，只要delete this马上会报错，因为堆栈内存小，容易覆盖
+		如果对象分配在堆里面， delete this不一定马上崩溃，待内存被覆盖或者指针delete时  才会触发崩溃！！
+		
+		//栈上面分配的马上崩溃，因为栈内存小容易覆盖
+		DeleteSelf delete_self_stack;
+		delete_self_stack.Set(1000);
+		delete_self_stack.Free();
+
+		//堆上面分配的不马上崩溃
+		DeleteSelf* delete_self_heap = new DeleteSelf();
+		delete_self_heap->Set(1000);
+		delete_self_heap->Free();
+
+		for (int i = 0; i < 100; ++i)
+		{
+			char *ch_p = new char[100];
+			memset(ch_p, 0, 100);
+		}
+
+		delete_self_heap->DumpFunc();		//不一定崩溃，只是对象的数据是乱的，如果类成员有指针对象(在构造会new在析构会delete)就会崩溃！！
+		
+		
+		只要你小心，一个对象请求自杀(delete this)，是可以的。
+		
+		以下是我对“小心”的定义：
+
+		你必须100%的确定，this对象是用 new分配的（不是用new[]，也不是用定位放置 new，也不是一个栈上的局部对象，也不是全局的，也不是另一个对象的成员，而是明白的普通的new）。
+
+		你必须100%的确定，该成员函数是this对象最后调用的的成员函数
+		
+		你必须100%的确定，剩下的成员函数（delete this之后的）不接触到this对象任何一块（包括调用任何其他成员函数或访问任何数据成员）
+		
+		当你的指针是一个指向基类类型的指针，而没有虚析构函数时（也不可以delete this--内存泄漏，子类没有delete）
+		
+		
+		一般来说，内存释放释放的只能是数据段的内容（包括堆和栈，但释放栈上的内存由系统进行），而代码段的内存，除一些病毒攻击等非正常强行改写手段外，在内存中是永远不会释放/改变的，
+		直到程序结束，因此在内存释放后也是可以访问的。所以，一般所谓的释放内存delete操作，是在数据段进行的释放
+		
+		delete this之后只要不访问到类成员和this---仍然可以调用不涉及成员的函数！！！！！！
+		
+	97.c++ 11 for(auto x : list) 范围循环：使用用数组和std容器，拥有begin() end()
+	//***********************一开始就定好开始和结束范围,因此不能循环内去增删容器元素导致迭代器失效！！
+	{ 
+		auto && __range = range_expression ; 
+		for (auto __begin = begin_expr, __end = end_expr; __begin != __end; ++__begin)
+			{
+				range_declaration = *__begin; 
+				loop_statement
+			} 
+	}
+	
+	使用auto关键字做类型自动推导时，依次施加一下规则：
+		1.如果初始化表达式是引用，则去除引用语义。
+		int a = 10;
+		int &b = a;
+
+		auto c = b;//c的类型为int而非int&（去除引用）
+		auto &d = b;//此时c的类型才为int&
+
+		c = 100;//a =10;
+		d = 100;//a =100;
+		
+		2.如果初始化表达式为const或volatile（或者两者兼有），则除去const/volatile语义--但函数返回值不会去除const 属性。
+		const int a1 = 10;
+		auto  b1= a1; //b1的类型为int而非const int（去除const）
+		const auto c1 = a1;//此时c1的类型为const int
+		b1 = 100;//合法
+		c1 = 100;//非法
+		
+		3.如果auto关键字带上&号，则不去除const语意。
+		const int a2 = 10;
+		auto &b2 = a2;//因为auto带上&，故不去除const，b2类型为const int
+		b2 = 10; //非法
+		
+		4.初始化表达式为数组时，auto关键字推导类型为指针。
+		
+		5.若表达式为数组且auto带上&，则推导类型为数组类型。
+		
+		6.函数或者模板参数不能被声明为auto
+		
+		7.时刻要注意auto并不是一个真正的类型。auto仅仅是一个占位符，它并不是一个真正的类型，不能使用一些以类型为操作数的操作符，如sizeof或者typeid。
+	
+	98.内存模型
+	BSS段（bss segment）
+		通常是指用来存放程序中未初始化的全局变量的一块内存区域。BSS是英文Block Started by Symbol的简称。BSS段属于静态内存分配。
+
+	数据段（data segment）
+		通常是指用来存放程序中 已初始化 的 全局变量 的一块内存区域。数据段属于静态内存分配。 
+
+	代码段（code segment/text segment）
+		通常是指用来存放 程序执行代码 的一块内存区域。这部分区域的大小在程序运行前就已经确定，并且内存区域通常属于 只读 ,某些架构也允许代码段为可写，
+		即允许修改程序。在代码段中，也有可能包含一些 只读的常数变量 ，例如字符串常量等。程序段为程序代码在内存中的映射.一个程序可以在内存中多有个副本.
+
+	堆(heap)
+		堆是用于存放进程运行中被动态分配的内存段，它的大小并不固定，可动态扩张或缩减。当进程调用malloc/free等函数分配内存时，新分配的内存就被动态添加到堆上（堆被扩张）/释放的内存从堆中被剔除（堆被缩减）
+
+	栈(stack) 
+		栈又称堆栈， 存放程序的 局部变量 （但不包括static声明的变量， static 意味着 在数据段中 存放变量）。除此以外，在函数被调用时，栈用来传递参数和返回值。由于栈的先进先出特点，所以栈特别方便用来保存/恢复调用现场。
+		
+	99.线程与纤程（其他语言的协程）
+	共同点都是由于程序上下文和独立的栈空间！
+	不同点：线程的切换由系统管理；纤程的切换由用户管理
+	
+	100.回调函数应用
+		1.注册回调状态
+		2.回调上下文
+		
+	(1)链式触发：一个触发遍历处理回调
+	(2)ID事件分发：通过table(hash)--根据ID调用回调
+	
+	101.程序安全（不应该约束使用者如何使用而是代码处理一切情况）
+	所有栈数据在出栈或者程序出错了都会被析构一遍：程序保证释放掉所有的，利用这一特性可以在会出错的代码地方在栈放入一个对象（与RAII技术相似）！！
+	
+	RAII，也称为“资源获取就是初始化；是c++等编程语言常用的管理资源、避免内存泄露的方法。它保证在任何情况下，使用对象时先构造对象，最后析构对象。
+	
+	
+	102.for 与for_each 还有c++11 for (auto x : range) --范围循环效率：
+	
+	for ()循环最好用有常量控制for次数以免死循环
+	
+	103.断言assert 是仅在Debug 版本起作用的宏
+	
+	104.std::hash
+	源码：
+	template<class _Kty>
+	struct _Bitwise_hash
+	{	// hash functor for plain old data
+	typedef _Kty argument_type;
+	typedef size_t result_type;
+
+	size_t operator()(const _Kty& _Keyval) const
+		{	// hash _Keyval to size_t value by pseudorandomizing transform
+		return (_Hash_seq((const unsigned char *)&_Keyval, sizeof (_Kty)));
+		}
+	};
+
+	//散列函数
+	inline size_t _Hash_seq(const unsigned char *_First, size_t _Count)
+	{	// FNV-1a hash function for bytes in [_First, _First + _Count)
+ #if defined(_WIN64)
+	static_assert(sizeof(size_t) == 8, "This code is for 64-bit size_t.");
+	const size_t _FNV_offset_basis = 14695981039346656037ULL;
+	const size_t _FNV_prime = 1099511628211ULL;
+
+ #else /* defined(_WIN64) */
+	static_assert(sizeof(size_t) == 4, "This code is for 32-bit size_t.");
+	const size_t _FNV_offset_basis = 2166136261U;
+	const size_t _FNV_prime = 16777619U;
+ #endif /* defined(_WIN64) */
+
+	size_t _Val = _FNV_offset_basis;
+	for (size_t _Next = 0; _Next < _Count; ++_Next)
+		{	// fold in another byte
+		_Val ^= (size_t)_First[_Next];
+		_Val *= _FNV_prime;
+		}
+	return (_Val);
+	}
+	
+	只要 v1 == v2返回值必相等
+	
+	std::hash<std::string> str_hash;
+	str_hash(test_str);		//传进去的是str内容
+	
+	105.单例模式实现：
+	template <typename T> class Singleton
+    {
+    private:
+        /** @brief Explicit private copy constructor. This is a forbidden operation.*/
+        Singleton(const Singleton<T> &);
+
+        /** @brief Private operator= . This is a forbidden operation. */
+        Singleton& operator=(const Singleton<T> &);
+    
+    protected:
+
+        static T* msSingleton;
+
+    public:
+        Singleton( void )
+        {
+            assert( !msSingleton );
+#if defined( _MSC_VER ) && _MSC_VER < 1200  //vc6.0不支持static_cast,将该类的第一个静态变量赋值给msSingleton（或者vs6.0以下多重继承原因）
+            int offset = (int)(T*)1 - (int)(Singleton <T>*)(T*)1;
+            msSingleton = (T*)((int)this + offset);
+#else
+        msSingleton = static_cast< T* >( this );
+#endif
+        }
+        ~Singleton( void )
+            {  assert( msSingleton );  msSingleton = 0;  }
+        /// Get the singleton instance
+        static T& getSingleton( void )
+        {   assert( msSingleton );  return ( *msSingleton ); }
+        /// @copydoc getSingleton
+        static T* getSingletonPtr( void )
+        { return msSingleton; }
+    };
+	
+	
+	106.std::move详解
+	因为实际上std::move并不能移动任何东西，它唯一的功能是将一个左值强制转化为右值引用，继而我们可以通过右值引用使用该值，以用于移动语义。
+	从实现上讲，std::move基本等同于一个类型转换：static_cast<T&&>(lvalue);
+	
+	107.
+	关键字 constexpr 于 C++11 中引入并于 C++14 中得到改善。它表示常数表达式。与 const 相同，它可应用于变量，因此如果任何代码试图修改该值，均将引发编译器错误。
+	与 const 不同，constexpr 也可应用于函数和类构造函数。 constexpr 指示值或返回值是常数，并且如果可能，将在编译时计算值或返回值。
+
+		1. constexpr 变量
+		const 和 constexpr 变量之间的主要区别在于：const 变量的初始化可以延迟到运行时，而 constexpr 变量必须在编译时进行初始化。所有 constexpr 变量均为常量，因此必须使用常量表达式初始化。
+		
+		2.constexpr 函数是在使用需要它的代码时，可以在编译时计算其返回值的函数。当其参数为 constexpr 值并且在编译时使用代码需要返回值时（例如，初始化一个 constexpr 变量或提供一个非类型模板参数），它会生成编译时常量
+		
+		3.与const不同，在constexpr声明中如果定义了一个指针，限定符constexpr仅对指针有效，与指针所指对象无关。
+		
+		4.C++11则使用delete关键字显式指示编译器不生成函数的默认版本
+		
+	108.函数的效能
+	nonmemeber、static member或nonstatic member函数都被转换为完全相同形式，所以三者效率完全相同。
+	inline函数在调用处展开了，相当宏了
+	
+	109.使用do{ } while(0)的好处
+		1.替代{},实现局部作用域.在一些C的实现里也可以用.
+		2.避免使用GOTO,用break做跳出.
+	
+<</基础知识>>
+
+	<<UNIX SOCKET>>
+	创建socket描述符
+		int socket(int family, int type, int protocol); //返回：成功返回非负描述符， 出错则返回-1
+		address family --AF    Protocol family --PF
+	TCP客户端与服务端建立连接
+		int connect(int sockfd, const struct sockaddr* serveraddr, socklen_ addrlen); //成功返回0， 出错返回-1  TCP三次握手发生
+		
+	bind函数把本地协议地址赋予一个套接字
+		int bind(int sockfd, const struct sockaddr* myaddr, socklen addrlen);	//成功返回0, 失败-1
+	对于tcp第二个参数可以指定一个地址或端口或者都指定或者都不指定
+	
+	accept函数由TCP服务器调用， 如果该链接队列为空， 那么进程被投入睡眠
+		int accept(int sockfd, struct sockadd* cliaddr, sockelen_t *addrlen);		//陈宫返回非负描述符，出错返回-1
+		
+	<<shutdown函数>>
+	终止网络连接的通常方法是调用close函数，不过close函数友两个限制，却可以使用shutdown来避免！！
+	 (1)close把描述符的引用计数减1.仅在该计数器为0时才关闭套接字；shutdown可以不管引用计数就激发tcp的正常终止序列；
+	 (2)close终止读和写两个方向的数据传送。既然tcp是全双工的，
+	 
+	 int shutdown(int sockfd, int howto);
+	 howto参数：SHUT_RD、SHUT_WR、SHUT_REWR
+	
+	<</UNIXT_SOCKET>>
+	
+	<<vs调试>>
+			另外 有一些解决方法：
+			首先打开菜单 项目->项目属性页 
+			选择 配置属性->链接器->调试->生成调试信息 改为 是 
+			选择 配置属性->C/C++ ->常规->调试信息格式 改为 用于“编辑并继续”的程序数据库(/ZI) 
+			选择 配置属性->C/C++ ->优化->优化 改为 禁用(/Od)
+			
+	调试技巧：
+		1.当只能看到汇编代码时，复制汇编中的地址然后转换为所知道的类型：在监视窗口(RMIInitGlobalRoleBackObject* )0x0f19aadc
+			
+	<</vs调试>>
+	
+<<汇编相关>>
+	E(Extended)
+
+	EAX  是"累加器"(accumulator), 它是很多加法乘法指令的缺省寄存器。
+
+	EBX  是"基地址"(base)寄存器, 在内存寻址时存放基地址。
+
+	ECX  是计数器(counter), 是重复(REP)前缀指令和LOOP指令的内定计数器。
+
+	EDX  则总是被用来放整数除法产生的余数。
+
+	ESI/EDI 分别叫做"源/目标索引寄存器"(source/destination index),因为在很多字符串操作指令中, DS:ESI指向源串,而ES:EDI指向目标串.
+
+	EBP 是"基址指针"(BASE POINTER), 它最经常被用作高级语言函数调用的"框架指针"(frame pointer). 在破解的时候,经常可以看见一个标准的函数起始代码:
+	　　
+	　　push ebp ; 保存当前ebp
+	　　mov ebp,esp ; EBP设为当前堆栈指针
+	　　sub esp, xxx ; 预留xxx字节给函数临时变量.
+	　　...
+	　　
+	　　这样一来,EBP 构成了该函数的一个框架, 在EBP上方分别是原来的EBP, 返回地址和参数. EBP下方则是临时变量. 函数返回时作 mov esp,ebp/pop ebp/ret  即可.
+
+	ESP  专门用作堆栈指针，被形象地称为栈顶指针，堆栈的顶部是地址小的区域，压入堆栈的数据越多，ESP也就越来越小。在32位平台上，ESP每次减少4字节
+<</汇编相关>>
+
+
+	
+	转义字符		意义									ASCII码值（十进制）
+	\a			响铃(BEL)											007
+	\b			退格(BS) ，将当前位置移到前一列						008
+	\f			换页(FF)，将当前位置移到下页开头					012
+	\n			换行(LF) ，将当前位置移到下一行开头					010**************************
+	\r			回车(CR) ，将当前位置移到本行开头					013**************************
+	\t			水平制表(HT) （跳到下一个TAB位置）					009**************************
+	\v			垂直制表(VT)										011
+	\\			代表一个反斜线字符''\'								092**************************
+	\'			代表一个单引号（撇号）字符							039
+	\"			代表一个双引号字符									034
+	\?			代表一个问号										063
+	\0			空字符(NULL)										000**************************
+	\ooo		1到3位八进制数所代表的任意字符						三位八进制
+	\xhh		1到2位十六进制所代表的任意字符						二位十六进制
+	
+<<动态库>>
+	人们将不同版本DLL混合造成的不一致性形象的称为 “动态连接库的地狱“(DLL Hell) ，甚至微软自己也这么说(http://msdn.microsoft.com/library/techart/dlldanger1.htm)。
+
+      如果你的程序使用你自己的DLL时请注意：
+		1.不能将debug和release版的DLL混合在一起使用。debug都是debug版，release版都是release版。
+		2.千万不要以为静态连接库会解决问题，那只会使情况更糟糕。
+
+解决办法是将debug和release的程序分别放在主程序的debug和release目录下
+	
+	隐式链接到 DLL，可执行文件必须从 DLL 的提供程序获取下列各项：
+	包含导出函数和/或 C++ 类的声明的头文件（.h 文件）。类、函数和数据均应具有 __declspec(dllimport)，有关更多信息，请参见 dllexport、dllimport。
+	要链接的导入库（.LIB files）。（生成 DLL 时链接器创建导入库。）
+	实际的 DLL（.dll 文件）。
+	
+	显式链接下，应用程序必须进行函数调用以在运行时显式加载 DLL。 为显式链接到 DLL，应用程序必须：
+	调用 LoadLibrary（或相似的函数）以加载 DLL 和获取模块句柄。
+	调用 GetProcAddress，以获取指向应用程序要调用的每个导出函数的函数指针。 由于应用程序是通过指针调用 DLL 的函数，编译器不生成外部引用，故无需与导入库链接。
+	使用完 DLL 后调用 FreeLibrary。
+
+	如果有多个 DLL 或 EXE，则无论是否正在使用不同版本的 Visual C++，你都可以具有多个 CRT。 例如，将 CRT 静态链接到多个 Dll 可能存在相同的问题。 遇到此静态 CRT 问题的开发人员已被告知使用 /MD 进行编译，以便使用 CRT DLL。 如果 Dll 跨 DLL 边界传递 CRT 资源，则可能遇到与 CRT 不匹配的问题，需要使用 Visual C++ 重新编译项目
+
+	尽量不要使用 /MT与/MTD进行  静态运行时库  链接的方式（可能造成CRT冲突）
+
+	动态库的编译选项和include的头文件相对应才行例如lua.lib的编译选项必须为：：cl.exe.c md.-Od -DWIN32 -D_DEBUG -D_LIB -D_UNICODE -DUNIC ODE -Gm -EHs -EH c -RTC1 -MDd -Fo才能链接
+	可以使用vs命令行工具：dumpbin命令查看dll lib的信息
+
+	当一个动态库所需其他的库是选择MT编译，这样会链接进DLL，例如tinyxml2，如果是MD链接，在没有vs开发环境的机器上运行会缺库
+	
+	通过隐式和显式链接，Windows 首先搜索“已知 DLL”，如 Kernel32.dll 和 User32.dll。 Windows 然后按下列顺序搜索 DLL：
+		当前进程的可执行模块所在的目录。
+		当前目录。
+		Windows 系统目录。 GetSystemDirectory 函数检索此目录的路径。
+		Windows 目录。 GetWindowsDirectory 函数检索此目录的路径。
+		PATH 环境变量中列出的目录。
+
+declspec : declare special
+
+	1.If you export data of class type or functions that return classes, be sure to export the class.
+
+	__declspec(dllexport):导出类时，当类内含有非基础类型(std::vector,string,或者模板时),导出不安全，由于不同的STL的实现，运行期可能出现不可预知的错误
+	因此用抽象类导出，实现继承！在头文件可以隐藏数据成员！
+	
+	__declspec(dllexport) : 将一个函数声名为导出函数，就是说这个函数要被包含她的程序之外的程序调用。   
+	extern "C" :  指示编译器用C语言方法给函数命名（需要跨平台必须extern "C"）
+	在制作DLL导出函数时由于C++存在函数重载，因此__declspec(dllexport)function(int,int)。在DLL会被decorate，例如被decorate成为function_int_int，
+	而且不同的编译器decorate的方法不同，造成了在用GetProcAddress取得function地址时的不便，
+	使用extern"C"时，上述的decorate不会发生，因为C没有函数重载，但如此一来被extern"C"修饰的函数，就不具备重载能力，可以说extern 和 extern "C"不是一回事
+
+visual studio平台：
+	vc工程与被链接的静态库（*.lib)文件之间要保持一致：
+	例如：  是共享模式使用MFC dll还是静态模式使用MFC dll？
+	是多线程还是单线程？
+	是调试模式还是release模式？
+	涉及的项目属性配置  /MDd   与 /MTd   /MD /MT
+	如果不一致，在链接阶段会报告错误，如：
+	LIBCMT.lib(invarg.obj) : error LNK2005: __initp_misc_invarg已经在 libcmtd.lib(invarg.obj) 中定义或者函数无法解析
+	
+	VC++目录：
+		包含目录：寻找#include<xxxx.h>中的xxxx.h的搜索目录
+		库目录：寻找.lib文件的搜索目录
+		
+		在头文件如何做到使用类 Foo 而无需访问类的定义？
+			1) 将数据成员类型声明为 Foo *或 Foo &；
+			2) 参数、返回值类型为 Foo 的函数只是声明（但不定义实现）；
+			3) 静态数据成员的类型可以被声明为 Foo，因为静态数据成员的定义在类定义之外。
+
+	C/C++：
+		常规->附加包含目录：寻找#include<xxxx.h>中的xxxx.h的搜索目录（每一项对应一个文件夹XXXX，文件夹中包含了编译时所需的头文件，使用时直接#include<XXXX>即可）
+		
+		
+《google》
+		将包含次序标准化可增强可读性、避免隐藏依赖（hidden dependencies，译者注：隐藏
+		依赖主要是指包含的文件中编译时），次序如下：C 库、C++库、其他库的.h、项目内的.h。
+		项目内头文件应按照项目源代码目录树结构排列，并且避免使用 UNIX 文件路径.（当前目
+		录）和..（父目录）。例如，google-awesome-project/src/base/logging.h 应像这样
+		被包含：
+		#include "base/logging.h"-----------------------------------------------------------------------------------------需要在附加目录上添加..(上层目录才行vcxproj的上层目录)
+		dir/foo.cc 的主要作用是执行或测试 dir2/foo2.h 的功能，foo.cc 中包含头文件的次序如
+		下：
+		dir2/foo2.h（优先位置，详情如下）
+		C 系统文件
+		C++系统文件
+		其他库头文件
+		本项目内头文件
+		这种排序方式可有效减少隐藏依赖，我们希望每一个头文件独立编译。最简单的实现方式是
+		将其作为第一个.h 文件包含在对应的.cc 中。
+		
+		
+
+	链接器：
+
+		常规->附加库目录：寻找.lib文件的搜索目录
+		输入->附加依赖项：lib库（C++的库会把函数、类的声明放在*.h中，实现放在*.cpp或*.cc中。编译之后，*.cpp，*.cc，*.c会被打包成一个.lib文件，这样可以保护源代码）
+		
+	1.包含目录和附加包含目录（库目录和附加库目录）的区别：
+
+		包含目录：修改了系统的include宏的值，是全局的；
+
+		附加包含目录：用于当前项目，对其他项目没有影响。
+
+    （	库目录和附加库目录的区别同上）
+
+	2.可知包含目录和附加包含目录（库目录和附加库目录）的区别主要在于全局还是当前，那么当需要对某工程添加这些目录时，通常情况下，都是在附加包含目录和附加库目录中添加的。
+
+	3. 要使用一个库，除了要include其头文件以外（附加包含目录），还要在链接过程中把lib加进去（附加库目录、附加依赖项）。
+
+	4.添加方法：
+
+	附加包含目录---添加工程的头文件目录：
+
+		  项目->属性->配置属性->C/C++->常规->附加包含目录：加上头文件的存放目录；
+
+    附加库目录---添加文件引用的lib静态库路径：
+
+      项目->属性->配置属性->链接器->常规->附加库目录：加上lib文件的存放目录；
+
+    附加依赖项---添加工程引用的lib文件名：
+
+      项目->属性->配置属性->链接器->输入->附加依赖项：加上lib文件名。
+
+	5.当需要向项目中添加.dll动态链接库时，直接将需要添加的.dll文件拖拽到项目生成的.exe所在的文件夹下即可（项目->属性->配置属性->常规->输出目录，可以看到.exe生成在哪个目录下）
+	
+	1.
+		lib:
+		多线程 (/MT)
+		多线程调试 (/MTd)  d -- debug
+		dll:
+		多线程 DLL  (/MD)动态库
+		多线程调试 DLL  (/MDd)
+	2.
+
+		
+		LIBCPMT.LIB		线程, 静态链接									/MT			_MT
+		MSVCPRT.LIB		多线程, 动态链接（MSVCP<version>.dll 的导入库）	/MD			_MT, _DLL
+		LIBCPMTD.LIB	多线程, 静态链接								/MTd		_DEBUG, _MT
+		MSVCPRTD.LIB	多线程, 动态链接（MSVCP<version>D.DLL 的导入库）/MDd		_DEBUG, _MT, _DLL
+	3.
+		（1）静态链接的单线程库
+		静态链接的单线程库只能用于单线程的应用程序， C 运行时库的目标代码最终被编译在应用程序的二进制文件中。通过 /ML编译选项可以设置 Visual C++ 使用静态链接的单线程库。
+ 
+		（2）静态链接的多线程库
+		静态链接的多线程库的目标代码也最终被编译在应用程序的二进制文件中，但是它可以在多线程程序中使用。通过 /MT编译选项可以设置 Visual C++ 使用静态链接的多线程库。
+ 
+		（3）动态链接的运行时库
+		动态链接的运行时库将所有的 C 库函数保存在一个单独的动态链接库 MSVCRTxx.DLL 中，MSVCRTxx.DLL处理了多线程问题。使用 /MD 编译选项可以设置 Visual C++ 使用动态链接的运行时库。
+		/MDd 、 /MLd 或 /MTd 选项使用 Debug runtime library( 调试版本的运行时刻函数库 )，与 /MD 、 /ML 或 /MT 分别对应。 Debug 版本的 Runtime Library包含了调试信息，
+		并采用了一些保护机制以帮助发现错误，加强了对错误的检测，因此在运行性能方面比不上 Release版本。 
+	 
+	4、下面是msdn关于Visual C++编译器选项的说明：
+	这些选项选择单线程或多线程运行时例程，指示多线程模块是否为 DLL，并选择运行时库的发布版本或调试版本。
+	
+	（1）/MD    定义 _MT 和 _DLL 以便同时从标准 .h 文件中选择运行时例程的多线程特定版本和 DLL特定版本。此选项还使编译器将库名 MSVCRT.lib 放入 .obj 文件中。
+	用此选项编译的应用程序静态链接到MSVCRT.lib。该库提供允许链接器解析外部引用的代码层。实际工作代码包含在 MSVCR71.DLL 中，该库必须在运行时对于与MSVCRT.lib 链接的应用程序可用。
+	当在定义了 _STATIC_CPPLIB (/D_STATIC_CPPLIB) 的情况下使用/MD 时，它将导致应用程序通过静态多线程标准 C++ 库 (libcpmt.lib) 而非动态版本 (msvcprt.lib)进行链接，同时仍通过 msvcrt.lib 动态链接到主 CRT。
+	 
+	（2）/MDd    定义 _DEBUG、_MT 和 _DLL，以便从标准 .h文件中选择运行时例程的调试多线程特定版本和 DLL 特定版本。它还使编译器将库名 MSVCRTD.lib 放入 .obj文件中。
+	 
+	（3）/ML    使编译器将库名 LIBC.lib 放入 .obj 文件中，以便链接器使用 LIBC.lib解析外部符号。这是编译器的默认操作。LIBC.lib 不提供多线程支持。
+	 
+	（4）/MLd    定义 _DEBUG 并使编译器将库名 LIBCD.lib 放入 .obj 文件中，以便链接器使用LIBCD.lib 解析外部符号。LIBCD.lib 不提供多线程支持。
+	 
+	（5）/MT    定义 _MT，以便从标准头 (.h)文件中选择运行时例程的多线程特定版本。此选项还使编译器将库名 LIBCMT.lib 放入 .obj 文件中，以便链接器使用LIBCMT.lib 解析外部符号。
+	创建多线程程序需要 /MT    或 /MD（或它们的调试等效选项 /MTd 或 /MDd）。
+	 
+	（6）/MTd    定义_DEBUG 和 _MT。定义 _MT 会导致从标准 .h 文件中选择运行时例程的多线程特定版本。此选项还使编译器将库名LIBCMTD.lib 放入 .obj 文件中，以便链接器使用 LIBCMTD.lib 解析外部符号。
+	创建多线程程序需要 /MTd 或/MDd（或它们的非调试等效选项 /MT 或 MD）。
+	 
+	（7）/LD    创建 DLL。将 /DLL 选项传递到链接器。链接器查找 DllMain函数，但并不需要该函数。如果没有编写 DllMain 函数，链接器将插入返回 TRUE 的 DllMain 函数。链接 DLL启动代码。
+	如果命令行上未指定导出 (.exp) 文件，则创建导入库 (.lib)；将导入库链接到调用您的 DLL 的应用程序。将/Fe 解释为命名 DLL 而不是 .exe 文件；默认程序名成为基名称.dll 而不是基名称.exe。
+	如果还未显式指定 /M选项之一，则将默认运行时库支持更改为 /MT。
+	 
+	（8）/LDd    创建调试 DLL。定义 _DEBUG。警告  不要混合使用运行时库的静态版本和动态版本。在一个进程中有多个运行时库副本会导致问题，因为副本中的静态数据不与其他副本共享。
+	链接器禁止在.exe 文件内部既使用静态版本又使用动态版本链接，但您仍可以使用运行时库的两个（或更多）副本。例如，当与用动态 (DLL)版本的运行时库链接的 .exe文件一起使用时，
+	用静态（非DLL）版本的运行时库链接的动态链接库可能导致问题。（还应该避免在一个进程中混合使用这些库的调试版本和非调试版本）。
+
+<</动态库>>
+	
+VAssist：	
+		开发阶段：
+
+		Ctrl+K->C（/）：注释一段代码；
+
+		Ctrl+K->U（/）：取消注释一段代码；
+
+		（//=）加入cpp里类方法前面的标准注释；
+
+		（//-）加入开发人员个人信息，包括主机名和修改时间；
+
+		编译阶段：
+
+		Ctrl+F7：单编译一个cpp文件；
+
+		Ctrl+Shift+B:重编译整个项目工程；
+
+		调试阶段：
+
+		F5：运行；
+
+		F9：在当前行增加/删除断点；
+
+		Ctrl+Shift+F9：删除所有断点；
+
+		F10：单步执行，跳过所执行的函数体部分；
+
+		F11：单步执行，会单步到所执行的函数体里面去；
+
+		Shift+F11：跳出当前执行的函数体部分；
+
+		============================
+
+		常用快捷键：(从最常用开始）
+		F9    　　  　　　　 // 设置断点
+		F5    　　　　　　　// 调试程序
+		F10    　　　　 　　// 单步
+		F11    　　 　　　　// 进入某个函数
+		Shift + F11   　　　// 从某个函数跳出
+
+
+		Shift+ Alt + O   　 // 打开文件名搜索对话框
+		Alt + G    　　 　　// 跳到定义处
+		Alt + O             // .h/.cpp切换
+		Alt + M    　　 　　// 输入函数名的一部分，查看某个函数
+		Alt + <-  　　 　　 // 退回到上一视图
+		Alt + ->   　　 　　// 前进到下一视图 （这个快捷键是自定义的）
+		Ctrl + }   　　 　　// 如当时光标在"{" 处，则跳到配对的 "}"。如当时光标在"}" 处，则跳到配对的 "{"。
+		Alt + 向上方向键    // 跳到上一个类或函数
+		Alt + 向下方向键    // 跳到下一个类或函数
+		Ctrl + /   　　　　 // 加注释（这个快捷键是自定义的）
+		Shift + F9   　　　// 快速查看变量
+		Alt + 3    　　　　// 查看变量
+		Alt + 7    　　　　// 查看堆栈---------------------------------------------------------------------------------
+		Alt + 6    　　　　// 查看内存---------------------------------------------------------------------------------
+		Shift + F5   　　  // 退出调试程序
+		Ctrl + F5   　　　 // 运行程序，注意不是调试
+		F7    　　　　　　 // 编译（如果编译后，出现了很多警告和个别错误，可以再按一下，F7再编译一次，这个时候，就会只出现错误，方便定位错误。）
+
+
+		Ctrl +  I   　　   // 输入，增量搜索（实时查找）
+		Ctrl + F3   　　   // 选中一个单词时，跳到下个单词（F3下一个，shift + F3 上一个）
+		Ctrl + Shift + F   // 在文件中查找关键字，当前工程，当前文档，打开的文档，自定义等
+		Ctrl + F2   　　   // 某行加书签 再按一次测去掉书签
+		F2    　　　　     // 跳到一个书签，再按一下测跳到下一个书签
+
+
+		Shift + F2 　　  // 跳到上一个书签
+
+
+		Ctrl + ->  　　    // 跳到一个单词最后  
+		Ctrl + <-  　　    // 跳到一个单词最前   
+		Ctrl + Shift + ->  // 选择光标后的一个单词 
+		Ctrl + Shift + <-  // 选择光标前的一个单词
+		Shift + ->   　　　// 选择后的一个字母，每按一次增先一个字母
+		Shift + <-    　　 // 选择前的一个字母，每按一次增先一个字母
+
+
+		Ctrl + Shift + 空格  // 当光标在函数参数时，则提示函数参数列表
+		Ctrl + B   　　　　 // 加条件断点
+		Ctrl + L   　　　　 // 删除一行
+
+
+		Ctrl + Home   　　// 跳到文档最前面
+		Ctrl + End   　　　// 跳到文档最后面
+		Home    　　        // 跳到一行最前面
+		End    　　　　     // 跳到一行最后面
+
+
+		4、Alt + Shift + R：
+		当想改掉一个类名或是其他东西的命名时，可能已经有很多地方引用这个名称了，这时按下此快捷键，可以很方便的辅助你重命名。
+
+		5、Alt + Shift + S：
+		方便你寻找某个对象或变量等等。
+
+		6、Alt + Shift + O：
+		定位文件。项目文件太多时，这个会帮上大忙，当然，你的文件名命名最好有个比较好的规范。
+
+		7、Alt + Shift + F：
+		光标放到某个字符串上，按下此键，会找出所有引用了这个字符串的地方。
+	
+	<</插件快捷方式>>
+	
+c++类设计：
+	<<类设计>>
+	
+	private: 只能由该类中的函数、其友元函数访问,不能被任何其他访问，该类的对象也不能访问，子类函数也不行. 
+	protected: 可以被该类中的函数、子类的函数、以及其友元函数访问,但不能被该类的对象访问 
+	public: 可以被该类中的函数、子类的函数、其友元函数访问,也可以由该类的对象访问
+	
+	友元声明：
+	class A
+	{
+		template<typename T>
+		friend class B;
+
+	public:
+		A() : m_a(0) {}
+	private:
+		int m_a;
+	};
+
+	template<typename T>
+	class B
+	{
+	public:
+
+		void Print()
+		{
+			printf("%d \n", a.m_a);
+		}
+	private:
+		T m_b;
+		A a;
+	};
+	
+		为什么static成员函数不能访问非static变量， 不能调用非static成员函数？
+
+       这个很好理解， static成员函数成员函数属于类， 独立于对象而存在， 不依赖于对象。 而非static成员函数、成员变量是依赖于对象的。 所以， 如果没有对象， 
+	   你用static成员函数去访问非static成员函数、成员变量， 那不是在扯淡么？
+
+       所以， static成员函数不能访问非static变量， 不能调用非static成员函数！
+	
+		类成员静态函数实例化静态对象 -- 类成员函数调用（减少构造、析构对象、记录对象状态）
+		
+		//在头文件中声明必须在cpp中定义！！
+		在C++的类定义内，static成员前的static意思是对一个变量的声明，而非定义。静态成员变量的初始化通常必须在类的定义外，即.cpp文件里而不是.h里
+		
+		
+<<<<<<<<		static：(只初始化一次, 但应该都是在程序启动时已经分配内存)                               >>>>>>>>>>>>>>>>>>>>>
+		
+		
+		
+			void Update(unsigned int now_second)
+			{
+				static unsigned int last_update_timestamp = 0; //初始化只执行一次！！！！
+
+				if (now_second - last_update_timestamp >= 30)
+				{
+					printf("last update timestamp is : %d", now_second);
+					last_update_timestamp = now_second;
+				}
+			}
+		
+		******存储在静态数据区的变量会在程序刚开始运行时就完成初始化，也是唯一的一次初始化而且是默认初始化为0****
+		
+		1.把局部变量改变为静态变量后是改变了它的存储方式即改变了它的生存期。把全局变量改变为静态变量后是改变了它的作用域，限制了它的使用范围。 
+		
+			(1)静态局部变量在函数内定义，但不象自动变量那样，当调用时就存在，退出函数时就消失。静态局部变量始终存在着，也就是说它的生存期为整个源程序。 
+			(2)静态局部变量的生存期虽然为整个源程序，但是其作用域仍与自动变量相同，即只能在定义该变量的函数内使用该变量。退出该函数后，尽管该变量还继续存在，但不能使用它。
+			(3)允许对构造类静态局部量赋初值。若未赋以初值，则由系统自动赋以0值。 
+			(4)对基本类型的静态局部变量若在说明时未赋以初值，则系统自动赋予0值。而对自动变量不赋初值，则其值是不定的。根据静态局部变量的特点，可以看出它是一种生存期为整个源程序的量。
+				 虽然离开定义它的函数后不能使用，但如再次调用定义它的函数时，它又可继续使用，而且保存了前次被调用后留下的值。因此，当多次调用一个函数且要求在调用之间保留某些变量的值时，
+			 	 可考虑采用静态局部变量。虽然用全局变量也可以达到上述目的，但全局变量有时会造成意外的副作用，因此仍以采用局部静态变量为宜。
+			 	 
+		2.静态全局变量
+			(1)全局变量(外部变量)的说明之前再冠以static 就构成了静态的全局变量。全局变量本身就是静态存储方式，静态全局变量当然也是静态存储方式。这两者在存储方式上并无不同。
+				 这两者的区别虽在于非静态全局变量的作用域是整个源程序，当一个源程序由多个源文件组成时，非静态的全局变量在各个源文件中都是有效的。而静态全局变量则限制了其作用域，
+				 即只在定义该变量的源文件内有效，在同一源程序的其它源文件中不能使用它。由于静态全局变量的作用域局限于一个源文件内，只能为该源文件内的函数公用，因此可以避免在其它源文件中引起错误。
+				 从以上分析可以看出， 把局部变量改变为静态变量后是改变了它的存储方式即改变了它的生存期。把全局变量改变为静态变量后是改变了它的作用域，限制了它的使用范围。
+				 因此static 这个说明符在不同的地方所起的作用是不同的。
+				 
+				 
+				 应予以注意。(#icnlude 包含static全局变量的地方，两者所使用的static变量是不同两个变量)
+				 static 作用与全局变量时改变了变量的作用域，因此，每个include   static变量的文件都有一个独立的static 变量，相互不影响（地址不同）
+				 
+				 statictest.h
+					static int static_global_var = 10;
+					void Print();
+					
+					
+				 statictest.cpp
+					void Print()
+					{
+						static_global_var = 100;
+						printf("Print: %d\n", static_global_var);
+					}
+					main.cpp:
+					
+					#include "statictest.h"
+					#include <stdio.h>
+					#include <stdlib.h>
+
+
+					/*
+					static 作用与全局变量时改变了变量的作用域，因此，每个include   static变量的文件都有一个独立的static 变量，相互不影响（地址不同）
+					*/
+					int main(int argc, char* argv[])
+					{
+						//static_global_var = 1000;
+						Print();
+						printf("main : %d\n", static_global_var);
+						system("pause");
+					}
+					
+					结果：Print::100; main: 10
+
+		
+		static A a;
+		与
+		A& GetInstance()
+		{
+			static A a;
+		}
+		的初始化时间
+		
+		静态生存周期的对象，即包括了全局变量，静态变量，静态类成员变量和函数静态变量，都必须是原生数据类型 (POD : Plain Old Data): 即 int, char 和 float, 以及 POD 类型的指针、数组和结构体
+		
+		3.类内静态函数：函数内不能访问非静态成员以及函数;静态函数没有this指针，会比一般成员函数会快些；
+		全局静态函数
+				 
+		4.extern 
+			（1）extern 用来声明(.h)全局变量（全局变量在其他地方声明，没有定义时在其它文件（没有#include）就需要extern）--在.cpp中定义这个变量vector<string> all_files;这样，每次包含这个头文件，
+					遇到extern时，编译器就知道在别处存在这个变量了，就不会重新定义了头文件中不能出现定义的，一般是些变量、函数、类型的声明
+			 (2) extern "C" 用c 编译器来编译与c函数的连接
+				     extern有两个作用，第一个 当它与" c" 一起连用时，如: extern " c"  void fun(int a  int b)  则告诉编译器在编译fun这个函数名时按着c的规则去翻译相应的函数名而不是c++的， 
+					 c++的规则在翻译这个函数名时会把fun这个名字变得面目全非，可能是fun abc_int_int#$也可能是别的，
+					 这要看编译器的" 脾气" 了(不同的编译器采用的方法不一样)，为什么这么做呢，因为c++支持函数的重载啊，在这里不去过多的论述这个问题，
+					 如果你有兴趣可以去网上搜索，相信你可以得到满意的解释!
+					当extern不与" c" 在一起修饰变量或函数时，如在头文件中: extern int g_int  它的作用就是声明函数或全局变量的作用范围的关键字，
+					其声明的函数和变量可以在本模块活其他模块中使用，记住它是一个声明不是定义!也就是说b模块(编译单元)要是引用模块(编译单元)a中定义的全局变量或函数时它只要包含a模块的头文件即可  
+					在编译阶段，模块b虽然找不到该函数或变量，但它不会报错，它会在连接时从模块a生成的目标代码中找到此函数。
+			 
+	 4. 类成员的修改与访问 -- 都应该通过接口实现！
+	 
+	 5. 位域
+	 
+		C/C++中以一定区域内的位(bit)为单位来表示的数据成为位域，位域必须指明具体的数目。
+
+		位域的作用主要是节省内存资源，使数据结构更紧凑。
+
+		(1) 一个位域必须存储在同一个字节中，不能跨两个字节，故位域的长度不能大于一个字节的长度。
+		(2) 取地址操作符&不能应用在位域字段上;
+		(3) 位域字段不能是类的静态成员;
+		(4) 位域字段在内存中的位置是按照从低位向高位的顺序放置的;
+		(5) 位域的对齐 -- 整个结构体的总大小为最宽基本类型成员大小的整数倍 --如果位域字段之间穿插着非位域字段，则不进行压缩；（不针对所有的编译器）
+		(6)  当要把某个成员说明成位域时,其类型只能是int,unsigned int与signed int三者之一(说明:int类型通常代表特定机器中整数的自然长度。short类型通常为16位,long类型通常为32位,int类型可以为16位或32位.各编译器可以根据硬件特性自主选择合适的类型长度.
+		见The C Programming Language中文 P32)
+		
+	 6.善用类继承、虚函数：类manager统一管理
+	 
+		当子类继承基类时，子类包含了父基类所有数据及操作的定义。C++实践中，继承主要用于两种场合：
+		实现继承（implementation inheritance），子类继承父类的实现代码；
+		接口继承（interface inheritance），子类仅继承父类的方法名称。
+		
+		多重继承中：虚拟继承是多重继承中特有的概念。虚拟基类是为解决多重继承而出现的。如下图所示。
+		防止子类包含多个祖父类
+		
+		优点：实现继承通过原封不动的重用基类代码减少了代码量。由于继承是编译时声明
+		（compile-time declaration），编码者和编译器都可以理解相应操作并发现错误。接口
+		继承可用于程序上增强类的特定 API 的功能，在类没有定义 API 的必要实现时，编译器同
+		样可以侦错。
+		
+		缺点：对于实现继承，由于实现子类的代码在父类和子类间延展，要理解其实现变得更加困
+		难。子类不能重写父类的非虚函数，当然也就不能修改其实现。基类也可能定义了一些数据
+		成员，还要区分基类的物理轮廓（physical layout）。
+		结论：
+		所有继承必须是 public 的，如果想私有继承的话，应该采取包含基类实例作为成员的方式
+		作为替代。
+		不要过多使用实现继承，组合通常更合适一些。努力做到只在“是一个”（"is-a"，译者注，
+		其他"has-a"情况下请使用组合）的情况下使用继承：如果 Bar 的确“是一种”Foo，才令 Bar
+		是 Foo 的子类。
+		
+		*********************************************************************************************************************************************************************************
+		必要的话，令析构函数为 virtual，必要是指，如果该类具有虚函数，其析构函数应该为虚函数。
+		当
+		Derived* p = new Derived();	(虚和非虚析构都不影响)
+		Base* p = new Derived();	(虚函数才能析构子类和基类，非虚只能虚构基类，因为当作基类析构处理，只有子类析构才回条用基类析构)
+		
+		
+
+	<</类设计>>
+	
+	<<案例>>
+		（1）
+		第一个线程函数：
+
+		DWORD   WINAPI   ThreadFuncA(LPVOID   lp) 
+		{ 
+			EnterCriticalSection(&cs); 
+			... 
+			//   操作dwTime 
+			... 
+			LeaveCriticalSection(&cs); 
+			return   0; 
+		}
+
+		写出这个函数之后，很多初学者都会错误地以为，此时cs对dwTime进行了锁定操作，
+		dwTime处于cs的保护之中。一个“自然而然”的想法就是——cs和dwTime一一对应上了。
+		这么想，就大错特错了。dwTime并没有和任何东西对应，它仍然是任何其它线程都可以访问的。
+		如果你像如下的方式来写第二个线程，那么就会有问题：
+		
+		DWORD   WINAPI   ThreadFuncB(LPVOID   lp) 
+		{ 
+			... 
+			//   操作dwTime 
+			... 
+			return   0; 
+		}
+		
+		当线程ThreadFuncA执行了EnterCriticalSection(&cs)，并开始操作dwTime[100]的时候，线程 ThreadFuncB可能随时醒过来，
+		也开始操作dwTime[100]，这样，dwTime[100]中的数据就被破坏了。
+		
+		为了让CRITICAL_SECTION发挥作用，我们必须在访问dwTime的任何一个地方都加上 EnterCriticalSection(&cs)和LeaveCriticalSection(&cs)语句。
+		所以，必须按照下面的 方式来写第二个线程函数：
+		
+		DWORD   WINAPI   ThreadFuncB(LPVOID   lp) 
+		{ 
+			EnterCriticalSection(&cs); 
+			... 
+			//   操作dwTime 
+			... 
+			LeaveCriticalSection(&cs); 
+			return   0; 
+		}
+		
+		这样，当线程ThreadFuncB醒过来时，它遇到的第一个语句是EnterCriticalSection(&cs)，这个语句将对cs变量 进行访问。
+		如果这个时候第一个线程仍然在操作dwTime[100]，cs变量中包含的值将告诉第二个线程，已有其它线程占用了cs。
+		因此，第二个线程的 EnterCriticalSection(&cs)语句将不会返回，而处于挂起等待状态。直到第一个线程执行了 LeaveCriticalSection(&cs)，
+		第二个线程的EnterCriticalSection(&cs)语句才会返回， 并且继续执行下面的操作
+		
+		
+		（2）
+		单例为这点也提供了解决方案。 除了创建单一实例以外，它也提供了一种获得它的全局方法。 使用这种范式，无论何处何人都可以访问实例。 综合起来，经典的实现方案如下：
+
+		class FileSystem				//线程不安全？
+		{
+		public:
+		  static FileSystem& instance()
+		  {
+			// 惰性初始化 --不加锁的话无法保证线程安全
+			if (instance_ == NULL) instance_ = new FileSystem();
+			return *instance_;
+		  }
+
+		private:
+		  FileSystem() {}
+
+		  static FileSystem* instance_;
+		};
+		静态的instance_成员保存了一个类的实例， 私有的构造器保证了它是唯一的。 公开的静态方法instance()让任何地方的代码都能访问实例。 在首次被请求时，它同样负责惰性实例化该单例。
+
+		现代的实现方案看起来是这样的：
+
+		class FileSystem
+		{
+		public:
+		  static FileSystem& instance()
+		  {
+			static FileSystem *instance = new FileSystem();			//不用加锁也能保证线程安全，因为static在进程开始只会初始化一次！！
+			return *instance;
+		  }
+
+		private:
+		  FileSystem() {}
+		};
+		
+		哪怕是在多线程情况下，C++11标准也保证了本地静态变量只会初始化一次， 因此，假设你有一个现代C++编译器，这段代码是线程安全的，而前面的那个例子不是
+		********************************************************************************************
+	<<\案例>>
+	
+	<<案例>>
+		字符串格式化：
+		#define INIT_GAME_STR(PATH, STR, FMT)\
+		{\
+			bool ret = false;\
+			std::string s_tmp;\
+			ret = config.get_item("/GameString/"PATH, &s_tmp);\
+			if (!ret)\
+			{\
+				*error = PATH;\
+				return false;\
+			}\
+			STR = new char[(int)s_tmp.size() + 1];\
+			strcpy(STR, s_tmp.c_str());\
+			ret = CheckFmt(STR, FMT);\
+			if (!ret)\
+			{\
+				*error = PATH;\
+				return false;\
+			}\
+		}
+
+	bool CheckFmt(const char *str, const char *fmt)
+	{
+		const char *fmt_p = fmt;
+		const char *str_p = str;
+		while (*fmt_p)
+		{
+			while (*str_p && *str_p++ != '%');
+			if (*str_p != *fmt_p++)
+			{
+				return false;
+			}
+		}
+		return true;
+	}
+	<<\案例>>
+	
+	<<案列>>
+		#include <iostream>
+		using namespace std;
+		class Base
+		{
+		public:
+			Base(){cout<<"Base::constructor is called!"<<endl;}
+			~Base(){cout<<"Base::destructor is called!"<<endl;}//大家关键是看这句
+			virtual void f(){cout<<"Base::f() is called!"<<endl;};
+		};
+
+		class Derived:public Base
+		{
+		public:
+			Derived(){cout<<"Derived::constructor is called!"<<endl;}
+			~Derived(){cout<<"Derived::destructor is called!"<<endl;}
+			virtual void f(){cout<<"Derived::f() is called!"<<endl;}
+		};
+
+		int main()
+		{
+			Base *pBase;
+			pBase = new Derived();
+			cout<<"*************************************"<<endl;
+			pBase->f();
+			cout<<"*************************************"<<endl;
+			delete pBase;
+
+			system("pause");
+			return 0;
+		}
+		
+		没错，也许你已经看出问题的所在了。C++明确指出，当一个继承类经由一个基类的指针删除时，而该基类包含的是一个非虚析构函数，其结果是未定义的（实际执行时通常发生的是继承类的独有成分没有销毁。
+		这个后果很严重，会造成内存泄漏。不过解决这个问题的方法也很简单。只要你在Base类的析构函数~Base()前加上一个virtual就行了。这时通过基类指针删继承类会得到你期望的结果。
+	<</案列>>
+	
+	<<线程>>
+		多线程使用需求：
+								用户事件（鼠标键盘事件或者其他）
+				1.事件驱动：	网络IO
+								磁盘IO
+					
+					
+				2.充分利用cpu
+				
+				
+		多线程应用：
+				1.数据并行				要求数据相互独立 将数据分开处理
+				2.任务并行（步骤）		步骤之间相互依赖--线程通信
+
+		线程通信/同步：
+				1.信号量--生产消费
+				2.互斥锁、临界区
+				3.事件event
+				
+		线程同步本质问题：
+				1.争用
+				2.协作	  生产消费
+				
+		为什么会有争用的问题：
+				1.编译器优化导致指令乱序--将无相关的指令重新排序--内存局部性和时间局部性（写代码就近声明使用原则）
+				2.cpu乱序执行
+				3.缓存一致性 cpu cache与内存数据不同步 ---（volatile可解决） 计算机的内存模型
+				
+				
+		线程同步api：
+				1.c++标准库提供api（c++11开始提供）
+				2.编译器提供的函数
+				3.操作系统提供的对象：mutex event semaphore critical_section
+				4.cpu指令：汇编层
+		
+		原子操作问题：cpu读写数据：内存是否对齐; 32位系统写大于32位的数据
+		
+				
+		线程池(解决频繁用户模式与内核模式切换开销):
+		
+	
+		CreateThread与_beginthreadex的本质区别：
+			_beginthreadex:在内部也是调用CreateThread进行线程创建，但在创建前会初始化每个线程专有的ptd数据；原因：
+				首先要从标准C运行库与多线程的矛盾说起，标准C运行库在1970年被实现了，由于当时没任何一个操作系统提供对多线程的支持。
+				因此编写标准C运行库的程序员根本没考虑多线程程序使用标准C运行库的情况。比如标准C运行库的全局变量errno。
+				很多运行库中的函数在出错时会将错误代号赋值给这个全局变量，这样可以方便调试。
+				假设某个线程A在执行上面的代码，该线程在调用system()之后且尚未调用switch()语句时另外一个线程B启动了，这个线程B也调用了标准C运行库的函数，
+				不幸的是这个函数执行出错了并将错误代号写入全局变量errno中。这样线程A一旦开始执行switch()语句时，
+				它将访问一个被B线程改动了的errno。这种情况必须要加以避免！
+				因为不单单是这一个变量会出问题，其它像strerror()、strtok()、tmpnam()、gmtime()、asctime()等函数也会遇到这种由多个线程访问修改导致的数据覆盖问题。
+				
+				uintptr_r __cdecl _beginthreadex(...)
+				{
+					//为即将创建的线程分配一个数据结构_ptiddata ptd(per-thread data)
+					//初始化这个数据结构,其中ptd->_thandle = (uintptr_t)(-1)
+					//如果初始化失败,返回(uintptr_t)(0) [_beginthread返回-1]
+					//用传进来的参数,调用CreateThread
+					//如果创建成功返回CreateThread返回的代码
+					//如果创建失败则释放ptd,并返回(uintptr_t)(0) [_beginthread返回-1,而CreateThread失败返回0,非-1]
+				}
+				
+		_beginthreadex类似于 Win32 CreateThread API 更多比_beginthread未。 _beginthreadex 和 _beginthread 存在以下不同：
+				1._beginthreadex 有三个其他参数：initflag、security 和 threadaddr。 新线程通过指定的 security 可创建为挂起状态，并且可使用线程标识符 thrdaddr 进行访问。
+				2.传递给 start_address 的 _beginthreadex 中的例程必须使用 __stdcall（用于本机代码）或 __clrcall（用于托管代码）调用约定，并且必须返回线程退出代码。
+				3._beginthreadex 如果失败，则返回 0，而不是 -1L。
+				4.使用 _beginthreadex 创建的线程已通过对 _endthreadex的调用终止。
+				
+	附： tmpnam:产生唯一的文件名
+	
+		创建：
+		1、CreateThread
+		2、_beginthread
+		3、_beginthreadex（最好， 会创建线程独有内存再调用CreateThread）
+		4、AfxBeginThread
+	
+	<</线程>>
+	
+	<<数据结构>>
+	1.数据结构类型
+	  size是元素个数，capacity则是指为vector分配的内存大小，显然，capacity一定要大于或等于size;
+	  
+	   array 
+	   vector:动态数组，支持下标索引存储和iterator 
+	   	关于vector的内存空间，有两个函数需要注意：size()成员指当前拥有的元素个数；
+	   		capacity()成员指当前(容器必须分配新存储空间之前)可以存储的元素个数。
+	   		reserve()成员可以用来控制容器的预留空间。vector另外一个特性在于它的内存空间会自增长，
+	   		每当vector容器不得不分配新的存储空间时，会以加倍当前容量的分配策略实现重新分配。例如，当前capacity为50，当添加第51个元素时，预留空间不够用了，
+	   		vector容器会重新分配大小为100的内存空间，作为新连续存储的位置。(重新赋值)
+	   由于vector的内存占用空间只增不减，比如你首先分配了10,000个字节，然后erase掉后面9,999个，留下一个有效元素，但是内存占用仍为10,000个。
+	   所有内存空间是在vector析构时候才能被系统回收。
+	   
+	   list
+	   
+	   dequeue: But, unlike vectors, deques are not guaranteed to store all its elements in contiguous storage locations: accessing elements in a deque by offsetting a pointer to another element causes undefined behavior.
+	   
+	   map
+	   
+	   set:注意一下insert效率
+			Extends the container by inserting new elements, effectively increasing the container size by the number of elements inserted.
+			Because elements in a set are unique, the insertion operation checks whether each inserted element is equivalent to an element already in the container, and if so, 
+			the element is not inserted, returning an iterator to this existing element (if the function returns a value).
+	   
+	   binary tree
+	 
+	   案例：
+			std::vector<int> vec;	
+			std::map<int, std::vector<int>::iterator> key_it_map;	
+			for (int i = 0; i < 10; i++)
+			{
+				int r = rand() % 100;
+				if (key_it_map.find(r) != key_it_map.end())
+				{
+					continue;
+				}
+
+				key_it_map[r] = vec.insert(vec.end(), r);
+			}	   
+	
+	<</数据结构>>
+	
+	<<钩子>>
+		系统钩子与线程钩子
+			SetWindowsHookEx()函数的最后一个参数决定了此钩子是系统钩子还是线程钩子。
+			线程钩子用于监视指定线程的事件消息。线程钩子一般在当前线程或者当前线程派生的线程内。
+			系统钩子监视系统中的所有线程的事件消息。因为系统钩子会影响系统中所有的应用程序，所以钩子函数必须放在独立的动态链接库(DLL) 中。
+			系统自动将包含“钩子回调函数”的DLL映射到受钩子函数影响的所有进程的地址空间中，即将这个DLL注入了那些进程。
+	 几点说明：
+			（1）如果对于同一事件（如鼠标消息）既安装了线程钩子又安装了系统钩子，那么系统会自动先调用线程钩子，然后调用系统钩子。
+			（2）对同一事件消息可安装多个钩子处理过程，这些钩子处理过程形成了钩子链。当前钩子处理结束后应把钩子信息传递给下一个钩子函数。
+			（3）钩子特别是系统钩子会消耗消息处理时间，降低系统性能。只有在必要的时候才安装钩子，在使用完毕后要及时卸载。
+	<</钩子>>>
+	
+<<Windows>>
+
+1. DWORD  WaitForSingleObject(HANDLE hObject, DWORD dwMilliseconds)函数
+
+	第一个参数 hObject标识一个能够支持被通知 /未通知的内核对象前面列出的任何一种对象都适用）。第二个参数dwMilliseconds允许该线程指明，为了等待该对象变为已通知状态，它将等待多长时间
+	WaitForSingleObject的返回值能够指明调用线程为什么再次变为可调度状态。如果线程等待的对象变为已通知状态，
+	那么返回值是 WAIT_OBJECT_0。如果设置的超时已经到期，则返回值是 WAIT_TIMEOUT。如果将一个错误的值（如一个无效句柄）传递给 WaitForSingleObject，那么返回值将是WAIT_FAILED
+	返回值：WAIT_ABANDONED  只有在等待互斥对象才回有这样的返回值！！！
+	
+2.	对象 				 |何时处于未通知状态 						何时处于已通知状态 							成功等待的副作用
+----------------------------------------------------------------------------------------------------------------------------------------
+	进程 				|当进程仍然活动时 						当进程终止运行时 									无
+	线程 				|当线程仍然活动时 						当线程终止运行时 									无
+	作业				|当作业的时间尚未结束时					当作业的时间已经结束时 								无
+	文件 				|当I/O请求正在处理时 					当I/O请求处理完毕时									无
+	控制台输入 			|不存在任何输入 							当存在输入时 									无
+	文件修改通知		|没有任何文件被修改 						当文件系统发现修改时 						重置通知
+	Event(auto reset)	|ResetEvet\PulseEvent或等待成功			调用SetEvent或者PulseEvent						重置事件(变成未通知状态)
+	Event(manual reset)	|ResetEvet\PulseEvent					调用SetEvent或者PulseEvent							无
+	Mutex				|等待成功								未被线程拥有(ReleaseMutex)						将所有权赋予线程
+	Semaphore			|等待成功								数量大于0时(ReleaseSemaphore)					数量递减1	
+
+	PS：内核对象运行会比原子操作慢些，从用户模式切到内核模式需要花费时间
+	
+	
+    1． 互斥量与临界区的作用非常相似，但互斥量是可以命名的，也就是说它可以跨越进程使用。所以创建互斥量需要的资源更多，所以如果只为了在进程内部是用的话使用临界区会带来速度上的优势并能够减少资源占用量。因为互斥量是跨进程的互斥量一旦被创建，就可以通过名字打开它。
+
+    2． 互斥量（Mutex），信号量（Semaphore），事件（Event）都可以被跨越进程使用来进行同步数据操作，而其他的对象与数据同步操作无关，但对于进程和线程来讲，如果进程和线程在运行状态则为无信号状态，在退出后为有信号状态。所以可以使用WaitForSingleObject来等待进程和线程退出。
+
+    3． 通过互斥量可以指定资源被独占的方式使用，但如果有下面一种情况通过互斥量就无法处理，比如现在一位用户购买了一份三个并发访问许可的数据库系统，可以根据用户购买的访问许可数量来决定有多少个线程/进程能同时进行数据库操作，这时候如果利用互斥量就没有办法完成这个要求，信号灯对象可以说是一种资源计数器
+	
+	//同步对象安全访问标记：
+	Synchronization Object Security and Access Rights：
+	The following table lists the standard access rights used by all objects.
+	Value															Meaning
+	DELETE (0x00010000L)										Required to delete the object.
+	READ_CONTROL (0x00020000L)									Required to read information in the security descriptor for the object, not including the information in the SACL.
+																To read or write the SACL, you must request the ACCESS_SYSTEM_SECURITY access right. For more information, see SACL Access Right.
+	SYNCHRONIZE (0x00100000L)									The right to use the object for synchronization. This enables a thread to wait until the object is in the signaled state.
+	WRITE_DAC (0x00040000L)										Required to modify the DACL in the security descriptor for the object.
+	WRITE_OWNER (0x00080000L)									Required to change the owner in the security descriptor for the object.
+	
+	event\mutex\semaphore\timer:都具有  XXXX_ALL_ACCESS和XXXX_MODIFY_STATE,			timer独有TIMER_QUERY_STATE
+	
+
+<</Windows>>	
+	
+	
+									<<<<<<<<<<<<<<<<LINUX>>>>>>>>>>>>>>>>>>>>>
+
+cd ~ -- 进入用户根目录
+
+man命令后面可以加一个数字参数，表示具体的范围定位：
+
+数字"1"表示用户命令
+数字"2"表示系统调用
+数字"3"表示C语言库函数
+数字"4"表示设备或特殊文件
+数字"5"表示文件格式和规则
+数字"6"表示游戏及其他
+数字"7"表示宏、包及其他杂项
+数字"8"表示系统管理员相关的命令
+
+配合管道使用（|）
+ps | grep
+sort -- 排序
+wc   -- 统计字数
+uniq -- 过滤重复
+
+在某些文件下查找关键字：
+ find ./ -name '*2016_06_13*' | xargs grep '78643547'
+ 
+ //查找当前文件根据类型 file 而且文件大小小于1byte
+  find ./ -type f -size -1c
+ 
+ //找出文件夹下文件类型并执行touch操作修改修改时间
+ find /your/dir -type f -exec touch {} + 	//linux 系统时间被修改，用来更改文件时间
+ 
+ exec选项后面跟随着所要执行的命令或脚本，然后是一对儿 {}，一个空格和一个\，最后是一个分号。     cmd {} \;
+ {} 花括号代表前面find查找出来的文件名。
+ 
+ 
+tail -n 20 filename  查看filename文件最后20行
+
+
+
+观察系统的使用状态：
+如果要看目前有谁在在线，可以下达『who』这个命令，而如果要看网络的联机状态，可以下达 『 netstat -a 』这个命令，而要看背景运行的程序可以运行『 ps -aux 』这个命令。使用这些命令可以让你稍微了解主机目前的使用状态！
+当然啰，就可以让你判断是否可以关机了 （这些命令在后面Linux常用命令中会提及喔！）
+
+通知在线使用者关机的时刻：
+要关机前总得给在线的使用者一些时间来结束他们的工作，所以，这个时候你可以使用 shutdown 的特别命令来达到此一功能。
+
+正确的关机命令使用：
+例如 shutdown 与 reboot 两个命令！
+所以底下我们就来谈一谈几个与关机/重新启动相关的命令啰！
+
+将数据同步写入硬盘中的命令： sync
+惯用的关机命令： shutdown  ； showndown -c取消关机
+重新启动，关机： reboot, halt, poweroff
+
+
+标准输入　　(stdin) ：代码为 0 ，使用 < 或 <<(追加方式) ；
+标准输出　　(stdout)：代码为 1 ，使用 > 或 >>(追加方式)；
+标准错误输出(stderr)：代码为 2 ，使用 2> 或 2>>(追加方式)；
+
+1.last reboot --查看最近重启记录
+
+2.查看md5值：md5sum EXEgameworld_release
+
+3. > 重定向(重定向到文件是覆盖方式); >> 重定向(重定向到文件是以追加方式),tee可以双向重定向
+
+4.linux关机的正确姿势: sync; sync; shutdown -h now
+
+5. /roor/.ssh/ 私密公密存放
+	整个过程是这样的：（1）远程主机收到用户的登录请求，把自己的公钥发给用户。（2）用户使用这个公钥，将登录密码加密后，发送回来。
+	（3）远程主机用自己的私钥，解密登录密码，如果密码正确，就同意用户登录。
+	
+	这个过程本身是安全的，但是实施的时候存在一个风险：如果有人截获了登录请求，然后冒充远程主机，
+	将伪造的公钥发给用户，那么用户很难辨别真伪。因为不像https协议，SSH协议的公钥是没有证书中心（CA）公证的，也就是说，都是自己签发的。
+	可以设想，如果攻击者插在用户与远程主机之间（比如在公共的wifi区域），用伪造的公钥，获取用户的登录密码。再用这个密码登录远程主机，
+	那么SSH的安全机制就荡然无存了。这种风险就是著名的"中间人攻击"（Man-in-the-middle attack）。
+	
+	免密码登录：所谓"公钥登录"，原理很简单，就是用户将自己的公钥储存在远程主机上。登录的时候，远程主机会向用户发送一段随机字符串，用户用自己的私钥加密后，再发回来。
+	远程主机用事先储存的公钥进行解密，如果成功，就证明用户是可信的，直接允许登录shell，不再要求密码
+
+6. iptables [-t table] COMMAND chain CRETIRIA -j ACTION
+		 -t table ：3个filter nat mangle
+		 COMMAND：定义如何对规则进行管理
+		 chain：指定你接下来的规则到底是在哪个链上操作的，当定义策略的时候，是可以省略的
+		 CRETIRIA:指定匹配标准
+		 -j ACTION :指定如何进行处理
+		 
+		 
+7.语法：dd [选项] （可用于创建虚拟内存）
+
+if =输入文件（或设备名称）。 
+
+of =输出文件（或设备名称）。 
+
+ibs = bytes 一次读取bytes字节，即读入缓冲区的字节数。 
+
+skip = blocks 跳过读入缓冲区开头的ibs*blocks块。 
+
+obs = bytes 一次写入bytes字节，即写入缓冲区的字节数。 
+
+bs = bytes 同时设置读/写缓冲区的字节数（等于设置ibs和obs）。 
+
+cbs = byte 一次转换bytes字节。 
+
+count=blocks 只拷贝输入的blocks块。 
+
+conv = ASCII 把EBCDIC码转换为ASCIl码。 
+
+conv = ebcdic 把ASCIl码转换为EBCDIC码。 
+
+conv = ibm 把ASCIl码转换为alternate EBCDIC码。 
+
+conv = block 把变动位转换成固定字符。 
+
+conv = ublock 把固定位转换成变动位。 
+
+conv = ucase 把字母由小写转换为大写。 
+
+conv = lcase 把字母由大写转换为小写。 
+
+conv = notrunc 不截短输出文件。 
+
+conv = swab 交换每一对输入字节。 
+
+conv = noerror 出错时不停止处理。 
+
+conv = sync 把每个输入记录的大小都调到ibs的大小（用NUL填充）。 
+
+<<shell>>
+
+示例，auto_run的前三行如下：
+#!/bin/sh
+#chkconfig: 2345 80 90
+#description:auto_run	
+如果没有此三行，chkconfig --add会报错
+
+#declare -a arr;声明一个数组arr
+
+
+nohup >/dev/null 2>&1 & -- 后台执行，并把错误输出当作正常输出到/dev/null文件,最后一个&是后台运行
+
+<<<<vim常用命令>>>>
+
+i, o, a(插入) R(取代) --> 编辑模式
+
+h,j,k,l --->左下上右
+或者 30j --> 向下移30行(常用)  -- nG -- n 为数字（setnumber显示行数）
+gg 移动到第一行
+
+ctrl + f 下一页（常用）
+ctr + b  上一页（常用）
+
+u			复原前一个动作。(常用)
+
+[Ctrl]+r	重做上一个动作。(常用)
+
+n <space>  -- (ˇ?ˇ) 向右移动 n个字符)
+
+0 或功能键[Home]	这是数字『 0 』：移动到这一行的最前面字符处 (常用)
+$ 或功能键[End]	移动到这一行的最后面字符处(常用)
+
+？向上查找   / 向下查找（常用）
+
+查找替换：
+	:n1,n2s/word1/word2/g	n1 与 n2 为数字。在第 n1 与 n2 行之间寻找 word1 这个字符串，并将该字符串取代为 word2 ！举例来说，在 100 到 200 行之间搜寻 vbird 并取代为 VBIRD 则：
+	『:100,200s/vbird/VBIRD/g』。(常用)
+	
+	:1,$s/word1/word2/g	从第一行到最后一行寻找 word1 字符串，并将该字符串取代为 word2 ！(常用)
+	
+	:1,$s/word1/word2/gc	从第一行到最后一行寻找 word1 字符串，并将该字符串取代为 word2 ！且在取代前显示提示字符给用户确认 (confirm) 是否需要取代！(常用)
+	
+	:%s/vivian/sky/（等同于 ：g/vivian/s//sky/） 替换每一行的第一个 vivian 为 sky 
+　 
+　　:%s/vivian/sky/g（等同于 ：g/vivian/s//sky/g） 替换每一行中所有 vivian 为 sky 
+
+	important：　可以使用 # 作为分隔符，此时中间出现的 / 不会作为分隔符
+
+删除、复制、粘贴：
+
+	dd		删除游标所在的那一整列(常用)
+	ndd	  n 为数字。删除光标所在的向下 n 列，例如 20dd 则是删除 20 列 (常用)
+	nx 		连续删除n个字符
+	x, X	在一行字当中，x 为向后删除一个字符 (相当于 [del] 按键)， X 为向前删除一个字符(相当于 [backspace] 亦即是退格键) (常用)
+
+
+i  -- insert 模式
+x  -- 删除当前光标所在字符
+wq -- 保存退出 (w +  文件名 ：文件另保存为...)
+dd -- 删除当前行(delete )
+yy -- 复制当前行(p -粘贴在光标下行/方 P -粘贴在光标上行/方)
+
+ZZ		这是大写的 Z 喔！若档案没有更动，则不储存离开，若档案已经被更动过，则储存后离开！
+:w [filename]	将编辑的数据储存成另一个档案（类似另存新档）
+:r [filename]	在编辑的数据中，读入另一个档案的数据。亦即将 『filename』 这个档案内容加到游标所在行后面
+:set nu	显示行号，设定之后，会在每一行的前缀显示该行的行号
+:set nonu	与 set nu 相反，为取消行号！
+
+grep 命令 用法大全
+
+1、 参数： 
+	-I ：忽略大小写 
+	-c ：打印匹配的行数 
+	-l ：从多个文件中查找包含匹配项 
+	-v ：查找不包含匹配项的行 
+	-n：打印包含匹配项的行和行标 
+
+2、RE（正则正则表达式） 
+	\ 忽略正则表达式中特殊字符的原有含义 
+	^ 匹配正则表达式的开始行 
+	$ 匹配正则表达式的结束行 
+	\< 从匹配正则表达式的行开始 
+	\> 到匹配正则表达式的行结束 
+	[ ] 单个字符；如[A] 即A符合要求 
+	[ - ] 范围 ；如[A-Z]即A，B，C一直到Z都符合要求 
+	. 所有的单个字符 
+	* 所有字符，长度可以为0 
+	
+	经过对比，我发现了只要是”^”这个字符是在中括号”[]”中被使用的话就是表示字符类的否定，如果不是的话就是表示限定开头。
+	我这里说的是直接在”[]”中使用，不包括嵌套使用。 其实也就是说”[]”代表的是一个字符集，”^”只有在字符集中才是反向字符集的意思
+	
+3、使用类名
+	可以使用国际模式匹配的类名：
+	[[:upper:]]   [A-Z]
+	[[:lower:]]   [a-z]
+	[[:digit:]]   [0-9]
+	[[:alnum:]]   [0-9a-zA-Z]
+	[[:space:]]   空格或tab
+	[[:alpha:]]   [a-zA-Z]
+
+	(1)使用
+		grep '5[[:upper:]][[:upper:]]' data.doc     #查询以5开头以两个大写字母结尾的行
+
+4、
+	下载一个文件
+	sz filename 
+
+	下载多个文件
+	sz filename1 filename2
+
+	下载dir目录下的所有文件，不包含dir下的文件夹
+	sz dir/*
+	
+5.
+	awk命令形式:
+	awk [-F|-f|-v] ‘BEGIN{} //{command1; command2} END{}’ file
+	 [-F|-f|-v]   大参数，-F指定分隔符，-f调用脚本，-v定义变量 var=value
+	'  '          引用代码块
+	BEGIN   初始化代码块，在对每一行进行处理之前，初始化代码，主要是引用全局变量，设置FS分隔符
+	//           匹配代码块，可以是字符串或正则表达式
+	{}           命令代码块，包含一条或多条命令-------------------------------------------------------------------------此处命令是每处理一行都执行的注意啦！！！
+	；           多条命令使用分号分隔
+	END      	 结尾代码块，在对每一行进行处理之后再执行的代码块，主要是进行最终计算或输出结尾摘要信息
+	
+	awk内置变量：
+	$0           	   表正则示整个当前行示整个当前行
+	$1           	   每行第一个字段
+	ARGC               命令行参数个数
+	ARGV               命令行参数排列
+	ENVIRON            支持队列中系统环境变量的使用
+	FILENAME           awk浏览的文件名
+	FNR                浏览文件的记录数
+	FS                 设置输入域分隔符，等价于命令行 -F选项（ [-F|-f|-v]   大参数，-F指定分隔符，-f调用脚本，-v定义变量 var=value）
+	NF                 浏览记录的域的个数
+	NR                 已读的记录数
+	OFS                输出域分隔符
+	ORS                输出记录分隔符
+	RS                 控制记录分隔符
+	awk 的指令間隔：所有 awk 的動作，亦即在 {} 內的動作，如果有需要多個指令輔助時，可利用分號『;』間隔，
+	或者直接以 [Enter] 按鍵來隔開每個指令，例如上面的範例中，鳥哥共按了三次 [enter] 喔！
+	邏輯運算當中，如果是『等於』的情況，則務必使用兩個等號『==』！
+	格式化輸出時，在 printf 的格式設定當中，務必加上 \n ，才能進行分行！
+	
+	awk 'BEGIN{ commands } pattern{ commands } END{ commands }' 
+	第一步：执行BEGIN{ commands }语句块中的语句； 
+	第二步：从文件或标准输入(stdin)读取一行，然后执行pattern{ commands }语句块，它逐行扫描文件，从第一行到最后一行重复这个过程，直到文件全部被读取完毕。 
+	第三步：当读至输入流末尾时，执行END{ commands }语句块。
+
+	
+	****************************************************與 bash shell 的變數不同，在 awk 當中，變數可以直接使用，不需加上 $ 符號-------------------------------变量直接变量名使用
+	
+	在awk执行语句中执行shell命令
+	如果system（）括号里面的参数没有加上双引号的话，awk认为它是一个变量，它会从awk的变量里面把它们先置换为常量，然后再回传给shell
+
+	如果system（）括号里面的参数有加上双引号的话，那么awk就直接把引号里面的内容回传给shell，作为shell的“命令行”
+	
+	例子：
+	（1） ps -elf|awk '{count=0} {list[count] = $15} { count++} {for (i=0; i < count; ++ i) print list[i]}' 打印所有进程路径
+	
+	# F 代表这个程序的旗标 (flag)， 4 代表使用者为 superuser；
+	# S 代表这个程序的状态 (STAT)；
+	# UID 代表执行者身份
+	# PID 进程的ID号！底下的 PPID 则父进程的ID；
+	# C CPU 使用的资源百分比
+	# PRI指进程的执行优先权(Priority的简写)，其值越小越早被执行；
+	# NI 这个进程的nice值，其表示进程可被执行的优先级的修正数值。
+	# ADDR 这个是内核函数，指出该程序在内存的那个部分。如果是个执行的程序，一般就是『 - 』
+	# SZ 使用掉的内存大小；
+	# WCHAN 目前这个程序是否正在运作当中，若为 - 表示正在运作；
+	# TTY 登入者的终端机位置啰；
+	# TIME 使用掉的 CPU 时间。
+	# CMD 所下达的指令名称
+	
+6.xargs 与 |:
+	管道是实现“将前面的标准输出作为后面的标准输入”
+	xargs是实现“将标准输入作为命令的参数”
+	echo "--help"|cat   				输出 --help
+	echo "--help"|xargs cat 			同等于 cat --help
+	
+
+《TCP/IP三次握手和四次握手》
+
+四次握手断开：
+	假设Client端发起中断连接请求，也就是发送FIN报文。Server端接到FIN报文后，意思是说"我Client端没有数据要发给你了"，
+	
+	但是如果你还有数据没有发送完成，则不必急着关闭Socket，可以继续发送数据。所以你先发送ACK，"告诉Client端，你的请求我收到了，
+	
+	但是我还没准备好，请继续你等我的消息"。这个时候Client端就进入FIN_WAIT状态，继续等待Server端的FIN报文。当Server端确定数据已发送完成，
+	
+	则向Client端发送FIN报文，"告诉Client端，好了，我这边数据发完了，准备好关闭连接了"。Client端收到FIN报文后，"就知道可以关闭连接了，
+	
+	但是他还是不相信网络，怕Server端不知道要关闭，所以发送ACK后进入TIME_WAIT状态，如果Server端没有收到ACK则可以重传（服务器等待ack）。“，Server端收到ACK后，"就知道可以断开连接了"。
+	
+	Client端等待了2MSL后依然没有收到回复，则证明Server端已正常关闭，那好，我Client端也可以关闭连接了。
+	Ok，TCP连接就这样关闭了！（虽然按道理，四个报文都发送完毕，我们可以直接进入CLOSE状态了，但是我们必须假象网络是不可靠的，
+	
+	有可以最后一个ACK丢失。所以TIME_WAIT状态就是用来重发可能丢失的ACK报文）
+
+
+<<<<<<<<<<<<<<<<<<<<< GDB -- GCC调试工具 >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+一、加载core文件
+
+	产生core dump之后， 用进行查看core文件的内容， 以定位文件中激发core dump的行.
+	gdb [exec file] [core file]
+	
+	
+	从文件中的命令执行 gdb：gdb -p 24525 -x gdb.txt EXEgameworld_release
+
+二、gdb其他命令
+
+	gcc/g++  -g (debug模式添加调试信息)
+	
+启动gdb：
+
+	1.gdb programname
+	2.gdb program core 用gdb同时调试一个运行程序和core文件，core是程序非法执行后core dum（崩溃）后产生的文件(记录崩溃时的环境变量)。
+	3.gdb program 1234 如果你的程序是一个服务程序，那么你可以指定这个服务程序运行时的进程ID。gdb会自动attach上去，并调试他。program应该在PATH环境变量中搜索得到。
+	
+	gdb可用以调试正在运行的进程。只需要知道进程的进程号。
+		gdb调试进程流程：
+		1，gdb -p PID指定调试的进程ID号。
+		或者先进入gdb再指定： gdb attach PID。
+		2，bt查看当前进程执行的调用栈
+		3，info threads查看当前可调试的线程。
+
+设置启动参数：
+
+	程序运行参数
+	set args 可指定运行时参数。（如：set args 10 20 30 40 50 ）
+	
+	show args 命令可以查看设置好的运行参数。
+	
+	run (r) 启动程序
+	
+	不指定运行参数 r
+	
+	指定运行参数r 10 20 30 40 50
+
+设置断点
+	break 设置断点，可以简写为b
+
+	b 10 设置断点，在源程序第10行
+	
+	b func 设置断点，在func函数入口处
+	
+	在进入指定函数时停住（断点后按c）:
+
+	C++中可以使用class::function()必须带参数或function(type,type)格式来指定函数名。如果有名称空间，可以使用namespace::class::function或者function(type,type)格式来指定函数名。
+	
+	break filename:linenum 
+	在源文件filename的linenum行处停住
+	
+	break filename:function 
+	在源文件filename的function函数的入口处停住
+	
+	break class::function或function(type,type)
+	在类class的function函数的入口处停住
+	
+	break namespace::class::function
+	在名称空间为namespace的类class的function函数的入口处停住
+	
+	查询所有断点
+	info b
+	
+	delete + 编号:删除指定编号断点
+	
+	clear 清除所有的已定义的停止点。
+
+	clear function 清除所有设置在函数上的停止点。
+
+	clear linenum 清除所有设置在指定行上的停止点。
+	
+调试代码：
+
+	run 运行程序，可简写为r
+	
+	next 单步跟踪，函数调用当作一条简单语句执行，可简写为n（逐过程）
+	
+	step 单步跟踪，函数调进入被调用函数体内，可简写为s（逐语句）
+	
+	finish 退出函数
+	
+	until 在一个循环体内单步跟踪时，这个命令可以运行程序直到退出循环体,可简写为u。
+	
+	continue 继续运行程序，可简写为c
+	
+	stepi或si, nexti或ni 单步跟踪一条机器指令,一条程序代码有可能由数条机器指令完成，stepi和nexti可以单步执行机器指令。
+	
+	info program 来查看程序的是否在运行，进程号，被暂停的原因。
+	
+	*强制调用函数： 
+	(gdb) call <expr> 
+	这里,<expr>可以是一个函数，这样就会返回函数的返回值，如果函数的返回类型是void那么就不会打印函数的返回值,但是实践发现，函数运行过程中的打印语句还是没有被打印出来。 
+
+	*强制调用函数2： 
+	(gdb) print <expr> 
+	这里，print和call的功能类似，不同的是，如果函数的返回值是void那么call不会打印返回值，但是print还是会打印出函数的返回值并且存放到历史记录中。
+	
+	*检测表达式变化则停住： 
+	(gdb) watch i != 10 
+	这里，i != 10这个表达式一旦变化，则停住。watch <expr> 为表达式（变量）expr设置一个观察点。一量表达式值有变化时，马上停住程序(也是一种断点)。
+	
+	print a：将显示整数 a 的值 
+	print a = 10 将变量赋值
+	或者veci
+	
+	set var 变量名=10  ---最好！
+	
+	print ++a：将把 a 中的值加1,并显示出来 
+	print name：将显示字符串 name 的值 
+	print gdb_test(22)：将以整数22作为参数调用 gdb_test() 函数 
+	print gdb_test(a)：将以变量 a 作为参数调用 gdb_test() 函数 
+	bt：显示当前程序的函数调用堆栈。 
+	display 表达式：在单步运行时将非常有用，使用display命令设置一个表达式后，它将在每次单步进行指令后，紧接着输出被设置的表达式及值。如： display a 
+	watch 表达式：设置一个监视点，一旦被监视的“表达式”的值改变，gdb将强行终止正在被调试的程序。如： watch a 
+	kill：将强行终止当前正在调试的程序 
+	help 命令：help 命令将显示“命令”的常用帮助信息 
+	call 函数(参数)：调用“函数”，并传递“参数”，如：call gdb_test(55) 
+
+查看堆栈信息
+	backtrace,简称bt
+	info 更多信息
+	
+	在linux平台下，设置core dump文件生成的方法：
+
+	1) 在终端中输入ulimit -c 如果结果为0，说明当程序崩溃时，系统并不能生成core dump。
+
+	2) 使用ulimit -c unlimited命令，开启core dump功能，并且不限制生成core dump文件的大小。如果需要限制，加数字限制即可。ulimit - c 1024
+
+	3) 默认情况下，core dump生成的文件名为core，而且就在程序当前目录下。新的core会覆盖已存在的core。通过修改/proc/sys/kernel/core_uses_pid文件，可以将进程的pid作为作为扩展名，生成的core文件格式为core.xxx，其中xxx即为pid
+
+	4) 通过修改/proc/sys/kernel/core_pattern可以控制core文件保存位置和文件格式。例如：将所有的core文件生成到/corefile目录下，文件名的格式为core-命令名-pid-时间戳. echo "/corefile/core-%e-%p-%t" > /proc/sys/kernel/core_pattern
+	
+	
+当程序由于野指针或者数组越界被修改导致程序崩溃；
+gdb调试可已使用watch *(type*)address  查看这个地址的值什么时候发生变化了
+	
+<<cmake>>
+
+编写CMakeLists.txt 
+然后cmake .
+最后make
+
+http://blog.atime.me/note/cmake.html
+
+cmake中一些预定义变量
+
+	PROJECT_SOURCE_DIR 工程的根目录
+	PROJECT_BINARY_DIR 运行cmake命令的目录,通常是${PROJECT_SOURCE_DIR}/build
+	CMAKE_INCLUDE_PATH 环境变量,非cmake变量
+	CMAKE_LIBRARY_PATH 环境变量
+	CMAKE_CURRENT_SOURCE_DIR 当前处理的CMakeLists.txt所在的路径
+	CMAKE_CURRENT_BINARY_DIR target编译目录
+	使用ADD_SURDIRECTORY(src bin)可以更改此变量的值
+	SET(EXECUTABLE_OUTPUT_PATH <新路径>)并不会对此变量有影响,只是改变了最终目标文件的存储路径
+	CMAKE_CURRENT_LIST_FILE 输出调用这个变量的CMakeLists.txt的完整路径
+	CMAKE_CURRENT_LIST_LINE 输出这个变量所在的行
+	CMAKE_MODULE_PATH 定义自己的cmake模块所在的路径
+	SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake),然后可以用INCLUDE命令来调用自己的模块
+	EXECUTABLE_OUTPUT_PATH 重新定义目标二进制可执行文件的存放位置
+	LIBRARY_OUTPUT_PATH 重新定义目标链接库文件的存放位置
+	PROJECT_NAME 返回通过PROJECT指令定义的项目名称
+	CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS 用来控制IF ELSE语句的书写方式
+	
+基本语法规则：
+
+cmake变量使用${}方式取值,但是在IF控制语句中是直接使用变量名
+环境变量使用$ENV{}方式取值,使用SET(ENV{VAR} VALUE)赋值
+指令(参数1 参数2…)
+参数使用括弧括起,参数之间使用空格或分号分开。
+
+以ADD_EXECUTABLE指令为例：
+	ADD_EXECUTABLE(hello main.c func.c)或者
+	ADD_EXECUTABLE(hello main.c;func.c)
+指令是大小写无关的,参数和变量是大小写相关的。推荐你全部使用大写指令。
+
+--------------------------------------------------------------------- MYSQL数据库命令 -----------------------------------------------------------------------
+
+SHOW DATABASES                                //列出 MySQL Server 数据库。
+SHOW TABLES [FROM db_name]                    //列出数据库数据表。
+SHOW TABLE STATUS [FROM db_name]              //列出数据表及表状态信息。
+SHOW COLUMNS FROM tbl_name [FROM db_name]     //列出资料表字段
+SHOW FIELDS FROM tbl_name [FROM db_name]，DESCRIBE tbl_name [col_name]。
+SHOW FULL COLUMNS FROM tbl_name [FROM db_name]//列出字段及详情
+SHOW FULL FIELDS FROM tbl_name [FROM db_name] //列出字段完整属性
+SHOW INDEX FROM tbl_name [FROM db_name]       //列出表索引。
+SHOW STATUS                                  //列出 DB Server 状态。
+SHOW VARIABLES                               //列出 MySQL 系统环境变量。
+SHOW PROCESSLIST                             //列出执行命令。
+SHOW GRANTS FOR user                         //列出某用户权限
+
+基本查询命令：
+ select * from personrank where rank_type = 1 order by rank_value DESC；
+ 
+ 基本统计命令：
+ 作为分表查询
+	SELECT `name`,count(`name`) as count  FROM `table` GROUP BY `name` HAVING count(`name`) > 1  ORDER BY count DESC;  
+ 
+ 基本插入命令：
+	//从一个表把相同字段插入另外一个表
+	insert into role_attr_detail4(role_attr_detail4_id, role_id) select role_attr_detail_id, role_id from role_attr_detail where role_id != 0;
+		
+ 
+ 基本更改命令：
+ 
+ 查询数据库记录不为空的表：
+ 
+ select TABLE_NAME from information_schema.tables where TABLE_SCHEMA='当前数据库' and table_rows>0;
+ 
+还要考虑的一点是，innodb采用聚簇索引的方式把数据存放起来，即B+树结构，因此每个页块中至少有两行数据，
+否则就失去了B+树的意义（每一个页中只有一条数据，整个树成为了一条双向链表），这样就得出了一行数据的最大长度就限制为了8k。
+当插入的一行数据不能不能在一个数据页块中存放时，为了保证该页至少能存放两行数据，innodb将会自动部分数据溢出到另外页中，
+一部分数据将存放在数据页块中，其大小为该列的前768字节，同时接着还有偏移指向溢出页。
+如上面所说大字段的前768字节会存放在数据页块中，那么如果有10个大字段（如varchar（1000），text，blob同varchar同样存储前768字节），
+同样会超过一行数据8k((16K/2)-200=7992)的限制（10*768<8000,11*768>8000）。如果插入的值超过8000字节，则会报错（BLOB或TEXT同理）：
+
+
+导出查询结果：Select语句 into outfile '保存路径+文件名';
+
+导入查询结果：load data local infile '保存路径+文件名' into table 表名 character set utf8;
+
+
+======================================================================== Shell ===============================================================
+1.变量
+	定义变量时，变量名不加美元符号（$，PHP语言中变量需要），如：
+	your_name="runoob.com"
+	注意，变量名和等号之间不能有空格，这可能和你熟悉的所有编程语言都不一样。同时，变量名的命名须遵循如下规则：
+	首个字符必须为字母（a-z，A-Z）。
+	中间不能有空格，可以使用下划线（_）。
+	不能使用标点符号。
+	不能使用bash里的关键字（可用help命令查看保留关键字）。
+	除了显式地直接赋值，还可以用语句给变量赋值，如：
+	for file in `ls /etc`
+	以上语句将 /etc 下目录的文件名循环出来。
+	
+	使用变量是最好 ${var}表示：清晰
+	
+2.单双引号
+	单引号
+	str='this is a string'
+	单引号字符串的限制：
+	单引号里的任何字符都会原样输出，单引号字符串中的变量是无效的；
+	单引号字串中不能出现单引号（对单引号使用转义符后也不行）。
+	
+	双引号
+	your_name='qinjx'
+	str="Hello, I know your are \"$your_name\"! \n"
+	双引号的优点：
+	双引号里可以有变量
+	双引号里可以出现转义字符
+	
+3.取字符长度:#${var}
+
+4.参数变量：
+	$0 执行文件名;
+	$1-$n : 执行程序后面紧跟的参数
+	
+	参数处理	说明
+	$#	传递到脚本的参数个数
+	$*	以一个单字符串显示所有向脚本传递的参数。
+	如"$*"用「"」括起来的情况、以"$1 $2 … $n"的形式输出所有参数。
+	$$	脚本运行的当前进程ID号
+	$!	后台运行的最后一个进程的ID号
+	$@	与$*相同，但是使用时加引号，并在引号中返回每个参数。
+	如"$@"用「"」括起来的情况、以"$1" "$2" … "$n" 的形式输出所有参数。
+	$-	显示Shell使用的当前选项，与set命令功能相同。
+	$?	显示最后命令的退出状态。0表示没有错误，其他任何值表明有错误。
+	
+5.反单引号： 数字1左边的键：在一串指令的執行中，還需要藉由其他額外的指令所提供的資訊時，
+	可以使用反單引號『`指令`』或 『$(指令)』。特別注意，那個 ` 是鍵盤上方的數字鍵 1 左邊那個按鍵，而不是單引號！ 
+	
+6.
+${變數#關鍵字}	若變數內容從頭開始的資料符合『關鍵字』，則將符合的最短資料刪除
+${變數##關鍵字}  若變數內容從頭開始的資料符合『關鍵字』，則將符合的最長資料刪除
+${變數%關鍵字}  若變數內容從尾向前的資料符合『關鍵字』，則將符合的最短資料刪除
+${變數%%關鍵字}  若變數內容從尾向前的資料符合『關鍵字』，則將符合的最長資料刪除
+${變數/舊字串/新字串}  若變數內容符合『舊字串』則『第一個舊字串會被新字串取代』
+ ${變數//舊字串/新字串}  若變數內容符合『舊字串』則『全部的舊字串會被新字串取代』
+ 
+ *	代表『 0 個到無窮多個』任意字元
+?	代表『一定有一個』任意字元
+[ ]	同樣代表『一定有一個在括號內』的字元(非任意字元)。例如 [abcd] 代表『一定有一個字元， 可能是 a, b, c, d 這四個任何一個』
+[ - ]	若有減號在中括號內時，代表『在編碼順序內的所有字元』。例如 [0-9] 代表 0 到 9 之間的所有數字，因為數字的語系編碼是連續的！
+[^ ]	若中括號內的第一個字元為指數符號 (^) ，那表示『反向選擇』，例如 [^abc] 代表 一定有一個字元，只要是非 a, b, c 的其他字元就接受的意思。
+
+
+符號	內容
+#	註解符號：這個最常被使用在 script 當中，視為說明！在後的資料均不執行
+\	跳脫符號：將『特殊字元或萬用字元』還原成一般字元
+|	管線 (pipe)：分隔兩個管線命令的界定(後兩節介紹)；
+;	連續指令下達分隔符號：連續性命令的界定 (注意！與管線命令並不相同)
+~	使用者的家目錄
+$	取用變數前置字元：亦即是變數之前需要加的變數取代值
+&	工作控制 (job control)：將指令變成背景下工作
+!	邏輯運算意義上的『非』 not 的意思！
+/	目錄符號：路徑分隔的符號
+>, >>	資料流重導向：輸出導向，分別是『取代』與『累加』
+<, <<	資料流重導向：輸入導向 (這兩個留待下節介紹)
+' '	單引號，不具有變數置換的功能 ($ 變為純文字)
+" "	具有變數置換的功能！ ($ 可保留相關功能)
+` `	兩個『 ` 』中間為可以先執行的指令，亦可使用 $( )
+( )	在中間為子 shell 的起始與結束
+{ }	在中間為命令區塊的組合！
+
+7.万能的垃圾桶：/dev/null 垃圾桶黑洞裝置與特殊寫法
+/dev/null，外号叫无底洞，你可以向它输出任何数据，它通吃，并且不会撑着！
+/dev/zero,是一个输入设备，你可你用它来初始化文件。
+
+/dev/null------它是空设备，也称为位桶（bit bucket）。任何写入它的输出都会被抛弃。如果不想让消息以标准输出显示或写入文件，那么可以将消息重定向到位桶。
+/dev/zero------该设备无穷尽地提供0，可以使用任何你需要的数目——设备提供的要多的多。他可以用于向设备或文件写入字符串0
+
+
+8.# 终端颜色设置
+PS1有那些配置，或者说PS1里头都能配置些命令提示符的什么东西：
+
+	\[\e[F;Bm\]，其中“F“为字体颜色，编号为30-37，“B”为背景颜色，编号为40-47。
+
+	序列         说明
+	\a                 ASCII 响铃字符（也可以键入 \007）
+	\d                 "Wed Sep 06" 格式的日期
+	\e                 ASCII 转义字符（也可以键入 \033）
+	\h                 主机名的第一部分（如 "mybox"）
+	\H                 主机的全称（如 "mybox.mydomain.com"）
+	\j                  在此shell中通过按 ^Z 挂起的进程数
+	\l                  此 shell 的终端设备名（如 "ttyp4"）
+	\n                 换行符
+	\r                  回车符
+	\s                  shell 的名称（如 "bash"）
+	\t                   24 小时制时间（如 "23:01:01"）
+	\T                  12 小时制时间（如 "11:01:01"）
+	\@                 带有 am/pm 的 12 小时制时间
+	\u                  用户名
+	\v                   bash 的版本（如 2.04）
+	\V                  Bash 版本（包括补丁级别）
+	\w                 当前工作目录（如 "/home/drobbins"）
+	\W                当前工作目录的“基名 (basename)”（如 "drobbins"）
+	\!                  当前命令在历史缓冲区中的位置
+	\#                 命令编号（只要您键入内容，它就会在每次提示时累加）
+	\$                 如果您不是超级用户 (root)，则插入一个 "$"；如果您是超级用户，则显示一个 "#"
+	\xxx              插入一个用三位数 xxx（用零代替未使用的数字，如 "\007"）表示的 ASCII 字符
+	\\                   反斜杠
+	\[                   这个序列应该出现在不移动光标的字符序列（如颜色转义序列）之前。它使 bash 能够正确计算自动换行。
+	\]                   这个序列应该出现在非打印字符序列之后。
+	
+   前景    背景    颜色
+　　30      40      黑色
+　　31      41      红色
+　　32      42      绿色
+　　33      43      黄色
+　　34      44      蓝色
+　　35      45      紫红色
+　　36      46      青蓝色
+　　37      47      白色
+
+	代码      意义
+	0            OFF
+	1            高亮显示
+	4            underline            
+	7            反白显示
+	8            不可见
+
+.bashrc
+
+# User specific aliases and functions
+
+alias rm='rm -i'
+alias cp='cp -i'
+alias mv='mv -i'
+alias grep='grep --color=auto'
+alias egrep='egrep --color=auto'
+alias rgrep='rgrep --color=auto'
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+        . /etc/bashrc
+fi
+
+export LANG=en_US.UTF-8
+export PS1='[\[\e[36;1m\]\u@\[\e[32;1m\]devel\[\e[31;1m\] \t \[\e[36;1m\]\w\[\e[0m\]]# '
+
+export HISTTIMEFORMAT="`whoami` %F %T "
+export HISTFILESIZE=1000000
+export HISTSIZE=10000
+shopt -s histappend
+
+ulimit -HSc unlimited
+ulimit -HSn 65535
+
+《-------------数学--------------------》
+矢量问题：
+
+1.矩阵 -- 矩阵的本质就是线性方程式，两者是一一对应关系
+列如方程：
+	2x+y = 7;
+	4x+3y = 3;
+
+	
+<<--------------------------------------------------------------------------------代码解析-------------------------------------------------------------------------------->>
+
+#ifndef RAOBJLIST_H
+#define RAOBJLIST_H
+
+#include <vector>
+#include <queue>
+
+/*
+	RAObjList
+
+	用法：	(1) Insert时返回一个index，以后存取该元素均用该index直接进行[]下标操作
+	(2) 提供Iterator、Const_Iterator进行遍历操作
+
+	性能：	(1) 取值、增加等操作时间复杂度为O(1)
+	(2) 删除操作如果元素位于beg或end，时间复杂度为O(n)，否则为O(1)
+
+	适用：	用于可分配ID的对象管理
+*/
+
+template<class T>
+class RAObjList
+{
+public:
+	template<class U, class PARE=RAObjList>
+	class _Iterator
+	{
+		friend class RAObjList;(RAObjList能访问_Iterator的成员)
+	public:
+		_Iterator():m_index(-1), m_parents(0){}
+
+		_Iterator<U, PARE>& operator ++()
+		{
+			++m_index;
+			while (m_index < m_parents->m_end.m_index && !m_parents->m_obj_use[m_index])
+			{
+				++m_index;
+			}
+			return *this;
+		}
+		const _Iterator<U, PARE> operator++(int)
+		{
+			_Iterator<U, PARE> t = *this;
+			operator ++();
+			return t;
+		}
+		_Iterator<U, PARE>& operator --()
+		{
+			--m_index;
+			while (m_index >= m_parents->m_beg.m_index && !m_parents->m_obj_use[m_index])
+			{
+				--m_index;
+			}
+			return *this;
+		}
+		const _Iterator<U, PARE> operator--(int)
+		{
+			_Iterator<U, PARE> t = *this;
+			operator --();
+			return t;
+		}
+
+		operator U*() { return &m_parents->m_obj[m_index]; } //这个是重载什么？返回值是什么？typedef _Iterator<T> Iterator;,返回T--重载转换()-没有写返回值但编译器返回U*
+		U* operator->() { return &m_parents->m_obj[m_index]; } //只有重载这个才能拿到容器对象（并非所有Iterator都是直接拿容器对象的，要看具体实现）
+		U& operator*() { return m_parents->m_obj[m_index]; }
+		bool operator==(const _Iterator<U, PARE> &_right) const { return (m_index == _right.m_index && m_parents == _right.m_parents); }
+		bool operator!=(const _Iterator<U, PARE> &_right) const { return (m_index != _right.m_index || m_parents != _right.m_parents); }
+
+		unsigned int m_index;
+	protected:
+		PARE *m_parents;
+		_Iterator(unsigned int index, PARE *parent=0):m_index(index), m_parents(parent){}
+	};
+	typedef _Iterator<T> Iterator;
+	typedef _Iterator<const T, const RAObjList<T> > Const_Iterator;
+
+	RAObjList(unsigned int size=4096):m_beg(0), m_end(0), m_size(0)
+	{
+		m_beg.m_parents = this;
+		m_end.m_parents = this;
+		m_obj.reserve(size);
+		m_obj_use.reserve(size);
+	}
+
+	RAObjList(const RAObjList<T> &_raol):m_beg(0), m_end(0), m_size(_raol.m_size)
+	{
+		*this = _raol;
+		m_beg.m_parents = this;
+		m_end.m_parents = this;
+	}
+
+	unsigned int Insert(const T &value)
+	{
+		unsigned int index = -1;
+		if (m_recovery_id.size() == 0)
+		{
+			index = (unsigned int)m_obj.size();
+			m_obj.push_back(value);
+			m_obj_use.push_back(true);
+		}
+		else
+		{
+			index = m_recovery_id.front();
+			m_recovery_id.pop();
+			new (&m_obj[index])T(value);	// 汇编指令是先去到m_obj[index]的地址放入寄存器，然后new T(vlaue)-构造函数，然后将new出来的地址赋值给&m_obj[index]
+			m_obj_use[index] = true;
+		}
+
+		if (m_beg.m_index == m_end.m_index) m_end.m_index = (m_beg.m_index = index) + 1;
+		else
+		{
+			if (m_beg.m_index > index) m_beg.m_index = index;
+			if (m_end.m_index <= index) m_end.m_index = index + 1;
+		}
+		++m_size;
+		return index;
+	}
+
+	void Erase(unsigned int index)
+	{
+		if (index >= m_obj_use.size() || !m_obj_use[index]) return;
+
+		m_obj[index].~T();
+		m_recovery_id.push(index);
+		m_obj_use[index] = false;
+
+		if (m_beg.m_index == index)
+		{
+			unsigned int i = index;
+			while(i < m_obj_use.size() && !m_obj_use[i] && i != m_end.m_index) ++i;
+			m_beg.m_index = i;
+		}
+		if (m_end.m_index == index + 1 && m_beg.m_index != m_end.m_index)
+		{
+			unsigned int i = index;
+			while(i < m_obj_use.size() && !m_obj_use[i] && i != m_beg.m_index) --i;
+			m_end.m_index = i + 1;
+		}
+		--m_size;
+	}
+
+	void Clear()
+	{
+		for (unsigned int i = 0; i < m_obj.size(); ++i)
+		{
+			if (m_obj_use[i])
+			{
+				m_obj[i].~T();
+			}
+		}
+		m_obj.clear();
+		m_obj_use.clear();
+		while (m_recovery_id.size() != 0) m_recovery_id.pop();
+		m_beg.m_index = 0;
+		m_end.m_index = 0;
+	}
+
+	Iterator Find(unsigned int index)
+	{
+		if (index < m_obj_use.size() && m_obj_use[index])
+		{
+			return Iterator(index, this);
+		}
+		return m_end;
+	}
+
+	Const_Iterator Find(unsigned int index) const
+	{
+		if (index < m_obj_use.size() && m_obj_use[index])
+		{
+			return Const_Iterator(index, this);
+		}
+		return Const_Iterator(m_end.m_index, this);
+	}
+
+	bool Exist(unsigned int index)
+	{
+		if (index < m_obj_use.size() && m_obj_use[index])
+		{
+			return true;
+		}
+		return false;
+	}
+
+	Iterator Beg() { return m_beg; }
+	Iterator End() { return m_end; }
+	Const_Iterator Beg() const { return Const_Iterator(m_beg.m_index, this); }
+	Const_Iterator End() const { return Const_Iterator(m_end.m_index, this); }
+	T& operator[](unsigned int i) { return m_obj[i]; }	// 此处不检查是否已经分配，由外部保证，如需检查请用Find
+	const T& operator[](unsigned int i) const { return m_obj[i]; }
+
+	bool Empty() const { return (0 == m_size); }
+	unsigned int Size() const { return m_size; }
+protected:
+	std::vector<T>				m_obj;
+	std::vector<bool>			m_obj_use;
+	std::queue<unsigned int>	m_recovery_id;
+
+	Iterator					m_beg;
+	Iterator					m_end;
+	unsigned int				m_size;
+};
+
+#endif
+
+
+	//序列化
+	bool Push(TLVType_t type, bool fixLength, TLVLength_t length, const void* value)
+	{
+
+		unsigned int total;
+		fixLength ? (total = sizeof(TLVType_t) + length) : (total = sizeof(TLVType_t) + sizeof(TLVLength_t) + length);
+
+
+		if (m_size + total > m_max_size)
+		{
+			return false;
+		}
+
+		char *current = m_buffer + m_size; //把指针移动至末尾再开始复制
+
+		//Type
+		*(TLVType_t*)(current) = type;
+		current += sizeof(TLVType_t);
+
+		//Length
+		if (!fixLength)
+		{
+			// 非定长类型才需要写长度
+			*(TLVLength_t*)(current) = length;
+			current += sizeof(TLVLength_t);
+		}
+
+		//Value
+		memcpy(current, value, length);
+		current +=  length;
+
+		m_size = (unsigned int)(current - m_buffer);
+
+		return true;
+	}
+	
+	//反序列化
+	template<class T>
+	bool Pop(T *value)
+	{
+		if (*(TLVType_t*)m_current_ptr == TLVTypeTraits<T>::TypeId)
+		{
+			TLVLength_t length;
+			m_current_ptr += sizeof(TLVType_t);
+			if ((int)TLVTypeTraits<T>::LengthType == (int)FixLength)
+			{
+				length = TLVTypeTraits<T>::Length(*value);
+			}
+			else
+			{
+				length = *(TLVLength_t*)m_current_ptr;
+				m_current_ptr += sizeof(TLVLength_t);
+			}
+				
+			if (TLVTypeTraits<T>::Set(value, m_current_ptr, length))
+			{
+				m_current_ptr += length;
+				return true;
+			}
+			return false;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+==========================================================================================================
+va_arg---相关
+
+ifdef  __cplusplus
+#define _ADDRESSOF(v)   ( &reinterpret_cast<const char &>(v) )
+#else
+#define _ADDRESSOF(v)   ( &(v) )
+#endif
+
+#if     defined(_M_IA64) && !defined(_M_CEE_PURE)
+#define _VA_ALIGN       8
+#define _SLOTSIZEOF(t)   ( (sizeof(t) + _VA_ALIGN - 1) & ~(_VA_ALIGN - 1) )
+
+#define _VA_STRUCT_ALIGN  16 
+
+#define _ALIGNOF(ap) ((((ap)+_VA_STRUCT_ALIGN - 1) & ~(_VA_STRUCT_ALIGN -1)) \
+        - (ap))
+#define _APALIGN(t,ap)  (__alignof(t) > 8 ? _ALIGNOF((uintptr_t) ap) : 0)
+
+#else
+#define _SLOTSIZEOF(t)   (sizeof(t))
+#define _APALIGN(t,ap)  (__alignof(t))
+#endif
+
+#if     defined(_M_CEE)
+
+extern void __cdecl __va_start(va_list*, ...);
+extern void * __cdecl __va_arg(va_list*, ...);
+extern void __cdecl __va_end(va_list*);
+
+#define _crt_va_start(ap,v)  ( __va_start(&ap, _ADDRESSOF(v), _SLOTSIZEOF(v), \
+                                __alignof(v), _ADDRESSOF(v)) )
+#define _crt_va_arg(ap,t)    ( *(t *)__va_arg(&ap, _SLOTSIZEOF(t), \
+                                _APALIGN(t,ap), (t *)0) )
+#define _crt_va_end(ap)      ( __va_end(&ap) )
+
+#elif   defined(_M_IX86)
+
+#define _INTSIZEOF(n)   ( (sizeof(n) + sizeof(int) - 1) & ~(sizeof(int) - 1) )
+
+#define _crt_va_start(ap,v)  ( ap = (va_list)_ADDRESSOF(v) + _INTSIZEOF(v) )
+#define _crt_va_arg(ap,t)    ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) )
+#define _crt_va_end(ap)      ( ap = (va_list)0 )
+
+#elif defined(_M_IA64)
+
+#ifdef  __cplusplus
+extern void __cdecl __va_start(va_list*, ...);
+#define _crt_va_start(ap,v)  ( __va_start(&ap, _ADDRESSOF(v), _SLOTSIZEOF(v), \
+                          _ADDRESSOF(v)) )
+#else
+#define _crt_va_start(ap,v)  ( ap = (va_list)_ADDRESSOF(v) + _SLOTSIZEOF(v) )
+#endif
+
+#define _crt_va_arg(ap,t)    (*(t *)((ap += _SLOTSIZEOF(t)+ _APALIGN(t,ap)) \
+                                                     -_SLOTSIZEOF(t)))
+
+#define _crt_va_end(ap)      ( ap = (va_list)0 )
+
+#elif defined(_M_AMD64)
+
+
+extern void __cdecl __va_start(va_list *, ...);
+
+#define _crt_va_start(ap, x) ( __va_start(&ap, x) )
+#define _crt_va_arg(ap, t)   \
+    ( ( sizeof(t) > sizeof(__int64) || ( sizeof(t) & (sizeof(t) - 1) ) != 0 ) \
+        ? **(t **)( ( ap += sizeof(__int64) ) - sizeof(__int64) ) \
+        :  *(t  *)( ( ap += sizeof(__int64) ) - sizeof(__int64) ) )
+#define _crt_va_end(ap)      ( ap = (va_list)0 )
+
+#else
+
+/* A guess at the proper definitions for other platforms */
+
+#define _INTSIZEOF(n)   ( (sizeof(n) + sizeof(int) - 1) & ~(sizeof(int) - 1) )
+
+#define _crt_va_start(ap,v)  ( ap = (va_list)_ADDRESSOF(v) + _INTSIZEOF(v) )
+#define _crt_va_arg(ap,t)    ( *(t *)((ap += _INTSIZEOF(t)) - _INTSIZEOF(t)) )
+#define _crt_va_end(ap)      ( ap = (va_list)0 )
+
+#endif
+
+#ifdef  __cplusplus
+}
+#endif
+
+#ifdef  _MSC_VER
+#pragma pack(pop)
+#endif  /* _MSC_VER */
+
+===============================================================================================
+
+#include "tlvprotocol.h"
+
+/*
+	MakeTLV 和 PopTLV 两个函数有严重的代码重复，下一次一旦需要修改这两个函数时，需先解决此问题
+
+*/
+#if defined(__GNUC_VA_LIST)
+const char* MakeTLV(TLVSerializer* tlv, const char* format, va_list v)
+#else
+const char* MakeTLV(TLVSerializer* tlv, const char* format, va_list v, void **v_out)
+#endif
+{
+	const char* p = format;
+	for(; *p != 0; ++p)
+	{
+		switch(*p)
+		{
+		case 'b':
+			{
+				unsigned char c = va_arg(v, int);		//整型数据，均需要使用int转型接收， 参见ISO Sec. 6.3.2.2
+				if ( !tlv->Push(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'h':
+			{
+				short c = va_arg(v, int);
+				if ( !tlv->Push(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'i':
+			{
+				int c = va_arg(v, int);
+				if ( !tlv->Push(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'k':
+			{
+				long long c = va_arg(v, long long);
+				if ( !tlv->Push(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'f':
+			{
+				float c = (float)va_arg(v, double);	//同理，浮点数需要用double接收
+				if ( !tlv->Push(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'd':
+			{
+				double c = va_arg(v, double);
+				if ( !tlv->Push(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 's':
+			{
+				const char *str = va_arg(v, const char*);
+				if ( !tlv->Push(str) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case '[':
+			{
+				TLVSerializer subtlv;
+				char *cur_buffer = (char*)tlv->Ptr();
+				unsigned int use_size = tlv->Size() + sizeof(TLVType_t) + sizeof(TLVLength_t);
+				subtlv.Reset(cur_buffer + use_size, tlv->MaxSize() - use_size);
+
+		#if defined(__GNUC_VA_LIST)
+				p = MakeTLV(&subtlv, p+1, v);
+		#else
+				void *v_out = 0;
+				p = MakeTLV(&subtlv, p+1, v, &v_out);
+				v = (va_list)v_out;
+		#endif
+
+				
+				if ( p == 0 || *p != ']')
+				{
+					return 0;
+				}
+				else
+				{
+					// 这里用比较难看的做法做到嵌套组包不重复复制
+					cur_buffer += tlv->Size();
+					*(TLVType_t*)(cur_buffer) = (TLVType_t)TLVTypeTraits<TLVSerializer>::TypeId;
+					cur_buffer = (char*)cur_buffer + sizeof(TLVType_t);
+
+					// 非定长，必须写 Length
+					*(TLVLength_t*)(cur_buffer) = (TLVLength_t)subtlv.Size();
+					cur_buffer = (char*)cur_buffer + sizeof(TLVLength_t);
+
+					tlv->MoveCurPos(sizeof(TLVType_t) + sizeof(TLVLength_t) + subtlv.Size());
+				}
+			}
+			break;
+		case ']':
+			{
+
+			#if defined(__GNUC_VA_LIST)
+
+			#else
+				*v_out = (void *)v;
+			#endif
+				return p;
+			}
+		case 'l':
+			{
+				TLVSerializer *s = va_arg(v, TLVSerializer*);
+				if ( !tlv->Push(*s) )
+				{
+					return 0;
+				}
+			}
+			break;
+		default:
+			return 0;
+
+		}
+	}
+
+#if defined(__GNUC_VA_LIST)
+
+#else
+	*v_out = (void *)v;
+#endif
+
+	return p;
+}
+
+#if defined(__GNUC_VA_LIST)
+const char* PopTLV(TLVUnserializer* tlv, const char* format, va_list v)
+#else
+const char* PopTLV(TLVUnserializer* tlv, const char* format, va_list v, void **v_out)
+#endif
+{
+	const char* p = format;
+	for(; *p != 0; ++p)
+	{
+		switch(*p)
+		{
+		case 'b':
+			{
+				unsigned char *c = va_arg(v, unsigned char*);
+				if ( !tlv->Pop(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'h':
+			{
+				short *c = va_arg(v, short*);
+				if ( !tlv->Pop(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'i':
+			{
+				int *c = va_arg(v, int*);
+				if ( !tlv->Pop(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'k':
+			{
+				long long *c = va_arg(v, long long*);
+				if ( !tlv->Pop(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'f':
+			{
+				float *c = va_arg(v, float*);
+				if ( !tlv->Pop(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 'd':
+			{
+				double *c = va_arg(v, double*);
+				if ( !tlv->Pop(c) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case 's':
+			{
+				const char **str = va_arg(v, const char**);
+				if ( !tlv->Pop(str) )
+				{
+					return 0;
+				}
+			}
+			break;
+		case '[':
+			{
+				TLVUnserializer subtlv;
+				if ( !tlv->Pop(&subtlv) )
+				{
+					return 0;
+				}
+
+			#if defined(__GNUC_VA_LIST)
+				p = PopTLV(&subtlv, p+1, v);
+			#else
+				void *v_out = 0;
+				p = PopTLV(&subtlv, p+1, v, &v_out);
+				v = (va_list)v_out;
+			#endif
+
+				if ( p == 0 || *p != ']')
+				{
+					return 0;
+				}
+			}
+			break;
+		case ']':
+			{
+
+			#if defined(__GNUC_VA_LIST)
+
+			#else
+				*v_out = (void *)v;
+			#endif
+
+				return p;
+			}
+			break;
+		case 'l':
+			{
+				TLVUnserializer *s = va_arg(v, TLVUnserializer*);
+				if ( !tlv->Pop(s) )
+				{
+					return 0;
+				}
+			}
+			break;
+		default:
+			return 0;
+
+		}
+	}
+
+#if defined(__GNUC_VA_LIST)
+
+#else
+	*v_out = (void *)v;
+#endif
+
+	return p;
+}
+
+
+bool TLVSerializer::Pushf(const char* format, ...)
+{
+	va_list v;
+	va_start(v, format);
+	bool ret = Pushv(format, v);
+	va_end(v);
+	return ret;
+}
+bool TLVSerializer::Pushv(const char* format, va_list v)
+{
+
+#if defined(__GNUC_VA_LIST)
+	const char* p = MakeTLV(this, format, v);
+#else
+	void *v_out = 0;
+	const char* p = MakeTLV(this, format, v, &v_out);
+#endif
+	
+	return p != 0;
+}
+
+bool TLVUnserializer::Popf(const char* format, ...)
+{
+	va_list v;
+	va_start(v, format);
+	bool ret = Popv(format, v);
+	va_end(v);
+	return ret;
+}
+
+bool TLVUnserializer::Popv(const char* format, va_list v)
+{
+
+#if defined(__GNUC_VA_LIST)
+	const char* p = PopTLV(this, format, v);
+#else
+	void *v_out = 0;
+	const char* p = PopTLV(this, format, v, &v_out);
+#endif
+
+	return p != 0;
+}
+
+
+=============================================================== opengl ===============================================================
+图形渲染流程
+
+1.图形渲染管线的第一个部分是顶点着色器(Vertex Shader)，它把一个单独的顶点作为输入。顶点着色器主要的目的是把3D坐标转为另一种3D坐标（后面会解释），同时顶点着色器允许我们对顶点属性进行一些基本处理。
+
+2.图元装配(Primitive Assembly)阶段将顶点着色器输出的所有顶点作为输入（如果是GL_POINTS，那么就是一个顶点），并所有的点装配成指定图元的形状；本节例子中是一个三角形。
+
+3.图元装配阶段的输出会传递给几何着色器(Geometry Shader)。几何着色器把图元形式的一系列顶点的集合作为输入，它可以通过产生新顶点构造出新的（或是其它的）图元来生成其他形状。例子中，它生成了另一个三角形。
+
+4.几何着色器的输出会被传入光栅化阶段(Rasterization Stage)，这里它会把图元映射为最终屏幕上相应的像素，生成供片段着色器(Fragment Shader)使用的片段(Fragment)。在片段着色器运行之前会执行裁切(Clipping)。裁切会丢弃超出你的视图以外的所有像素，用来提升执行效率。
+
+5.OpenGL中的一个片段是OpenGL渲染一个像素所需的所有数据。
+片段着色器的主要目的是计算一个像素的最终颜色，这也是所有OpenGL高级效果产生的地方。通常，片段着色器包含3D场景的数据（比如光照、阴影、光的颜色等等），这些数据可以被用来计算最终像素的颜色。
+
+6.在所有对应颜色值确定以后，最终的对象将会被传到最后一个阶段，我们叫做Alpha测试和混合(Blending)阶段。这个阶段检测片段的对应的深度（和模板(Stencil)）值（后面会讲），
+用它们来判断这个像素是其它物体的前面还是后面，决定是否应该丢弃。这个阶段也会检查alpha值（alpha值定义了一个物体的透明度）并对物体进行混合(Blend)。
+所以，即使在片段着色器中计算出来了一个像素输出的颜色，在渲染多个三角形的时候最后的像素颜色也可能完全不同。
+
+
+坐标系统：
+总之，以下的都是用来访问一个向量的分量的： 
+x, y, z, w  把一个向量当作位置来看 
+r, g, b, a  把一个向量当作颜色来看 
+s, t, p, q  把一个向量当作纹理坐标来看 
+
+局部空间(Local Space，或者称为物体空间(Object Space))
+世界空间(World Space)
+观察空间(View Space，或者称为视觉空间(Eye Space))
+裁剪空间(Clip Space)
+屏幕空间(Screen Space)
+
+局部坐标-->世界坐标-->观察者坐标-->投影坐标（裁剪空间）-->屏幕坐标
+1.物体的坐标将会从局部变换到世界空间；该变换是由模型矩阵(Model Matrix)实现的；模型矩阵是一种变换矩阵，它能通过对物体进行位移、缩放、旋转来将它置于它本应该在的位置或朝向
+2.将观察坐标变换为裁剪坐标的投影矩阵可以为两种不同的形式，每种形式都定义了不同的平截头体。
+我们可以选择创建一个正射投影矩阵(Orthographic Projection Matrix)或一个透视投影矩阵(Perspective Projection Matrix)。
+
+
+
+=============================================================== unity3d的简单实用 ===============================================================
+unity 版本控制：添加新资源、文件之类的，unity不是依靠文件路径去引用而是通过.meta(属性文件里面的信息：包含一个全局的guid) 
+--删除资源把meta和相关资源删除，否则造成后来生成的guid会使用原来的资源！！！
